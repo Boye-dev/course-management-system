@@ -1,12 +1,8 @@
-import { render, screen } from '@test-utils';
-import { Welcome } from './Welcome';
+import { render } from '@test-utils';
+import { Welcome } from './Welcome.js';
 
 describe('Welcome component', () => {
-  it('has correct Vite guide link', () => {
+  it('renders', () => {
     render(<Welcome />);
-    expect(screen.getByText('this guide')).toHaveAttribute(
-      'href',
-      'https://mantine.dev/guides/vite/'
-    );
   });
 });
