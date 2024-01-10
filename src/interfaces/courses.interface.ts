@@ -1,3 +1,7 @@
+/* eslint-disable import/no-cycle */
+import { IStudentDetails } from './student.interface';
+import { ITeacherDetails } from './teachers.interface';
+
 export interface ICourseDetails {
   name: string;
   department: IDepartmentDetails;
@@ -21,6 +25,8 @@ export interface ISchoolDetails {
 
 export interface IEnrolledCourseDetails {
   course: ICourseDetails;
+  student: IStudentDetails;
+  teacher: ITeacherDetails;
   grade: string;
   score: number;
   _id: string;

@@ -11,14 +11,14 @@ const Courses = () => {
         <Flex justify="space-between" align="center">
           <Title my={30}>My Courses</Title>
         </Flex>
-        <Flex
-          justify="space-between"
-          align="center"
-          wrap="wrap"
-          gap={20}
-          onClick={() => navigate('1/my-courses')}
-        >
-          <Paper w={300} h={100} shadow="xs" style={{ cursor: 'pointer' }}>
+        <Flex justify="space-between" align="center" wrap="wrap" gap={20}>
+          <Paper
+            w={300}
+            h={100}
+            shadow="xs"
+            style={{ cursor: 'pointer' }}
+            onClick={() => navigate('1/my-courses')}
+          >
             <Flex align="center" justify="center" h="100%">
               <IconCertificate color={theme.colors.brandSecondary?.[9]} size={30} />
               <Text color={theme.colors.brandSecondary?.[9]} fz={25} ml={10} fw={600}>

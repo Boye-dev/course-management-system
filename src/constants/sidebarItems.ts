@@ -32,3 +32,13 @@ export const studentSideBarItems: SidebarItemInterface[] = [
   },
   { text: 'Courses', icon: IconBook, path: '/student/courses', roles: [Roles.STUDENT] },
 ];
+
+export const teacherSideBarItems: SidebarItemInterface[] = [
+  {
+    text: 'Personal Information',
+    icon: IconUser,
+    path: '/teacher/personal-info',
+    roles: [Roles.TEACHER],
+  },
+  { text: 'Courses', icon: IconBook, path: '/teacher/courses', roles: [Roles.STUDENT] },
+];

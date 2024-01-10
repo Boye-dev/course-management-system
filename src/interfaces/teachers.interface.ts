@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import { IDepartmentDetails } from './courses.interface';
 
 export interface ITeacherDetails {
