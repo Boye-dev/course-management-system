@@ -1,10 +1,10 @@
 import { Checkbox, Paper, Table, TableProps, Text, useMantineTheme } from '@mantine/core';
-import React, { useState } from 'react';
+import React from 'react';
 import classes from '../styles/Table.module.css';
 import MantinePagination from './Pagination';
 
 interface CustomTableProps<T> extends TableProps {
-  head: ColumnProps<keyof T>[];
+  head: ColumnProps<keyof T, T>[];
   values: T[];
   checkbox?: boolean;
   onRowItemClick?: (_item: T) => void;
@@ -13,11 +13,13 @@ interface CustomTableProps<T> extends TableProps {
   pageSize: string;
   total: number;
   page: number;
+  selectedRows?: T[];
+  setSelectedRows?: React.Dispatch<React.SetStateAction<T[]>>;
 }
-interface ColumnProps<T> {
+interface ColumnProps<T, K> {
   label: string;
   key: T;
-  render?: (_val: any) => React.ReactNode;
+  render?: (_row: K, _val: any) => React.ReactNode;
 }
 const MantineTable = <T,>({
   head,
@@ -29,14 +31,17 @@ const MantineTable = <T,>({
   pageSize,
   total,
   page,
+  selectedRows,
+  setSelectedRows,
+  ...props
 }: CustomTableProps<T>) => {
   const theme = useMantineTheme();
-  const [selectedRows, setSelectedRows] = useState<T[]>([]);
+
   const tableHead = head.map((item, index) => <Table.Th key={index}>{item.label}</Table.Th>);
 
   const tableData = values?.map((item, index) => (
     <Table.Tr
-      key={index}
+      key={index + 1}
       className={classes.row_hover}
       onClick={() => onRowItemClick && onRowItemClick(item)}
       style={{
@@ -44,18 +49,20 @@ const MantineTable = <T,>({
         backgroundColor: (index + 1) % 2 === 0 ? theme.colors.brandSecondary[7] : '',
       }}
     >
-      {checkbox && (
+      {checkbox && selectedRows && setSelectedRows && (
         <Table.Td>
           <Checkbox
-            aria-label="Select row"
-            checked={selectedRows.includes(item)}
-            onChange={(event) =>
+            style={{ cursor: 'pointer', zIndex: 100 }}
+            checked={
+              selectedRows.find((val) => JSON.stringify(val) === JSON.stringify(item)) !== undefined
+            }
+            onChange={(event) => {
               setSelectedRows(
                 event.currentTarget.checked
                   ? [...selectedRows, item]
-                  : selectedRows.filter((val) => val !== item)
-              )
-            }
+                  : selectedRows.filter((val) => JSON.stringify(val) !== JSON.stringify(item))
+              );
+            }}
           />
         </Table.Td>
       )}
@@ -63,7 +70,7 @@ const MantineTable = <T,>({
         <>
           <Table.Td key={keyIndex}>
             {key.render ? (
-              key.render(item[key.key])
+              key.render(item, item[key.key])
             ) : (
               <Text c={(index + 1) % 2 !== 0 ? theme.colors.dark[9] : theme.white}>
                 {item[key.key as keyof T] as React.ReactNode}
@@ -78,7 +85,7 @@ const MantineTable = <T,>({
   return (
     <Paper p={10} shadow="xs" mah="calc(100vh - 60px)">
       <Table.ScrollContainer minWidth="100%">
-        <Table>
+        <Table {...props}>
           <Table.Tr>
             {checkbox && <Table.Th />}
             {tableHead}

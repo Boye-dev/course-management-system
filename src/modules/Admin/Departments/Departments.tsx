@@ -3,8 +3,8 @@ import { useDisclosure } from '@mantine/hooks';
 import { Box, Button, Flex, Title } from '@mantine/core';
 import MantineTable from '@/shared/components/Table';
 
-import AddNewDepartmentDrawer from '@/components/Departments/AddNewDepartmentDrawer';
-import EditDepartmentDrawer from '@/components/Departments/EditDepartmentDrawer';
+import AddNewDepartmentDrawer from '@/components/Admin/Departments/AddNewDepartmentDrawer';
+import EditDepartmentDrawer from '@/components/Admin/Departments/EditDepartmentDrawer';
 import { IDepartmentDetails } from '@/interfaces/courses.interface';
 
 interface ITableParams {
