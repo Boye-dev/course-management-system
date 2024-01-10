@@ -1,44 +1,78 @@
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom';
+import { LoadingOverlay } from '@mantine/core';
 import Layout from './shared/layout/Layout';
-import PersonalInformation from './pages/PersonalInformation/PersonalInformation';
+import PersonalInformation from './modules/Admin/PersonalInformation/PersonalInformation';
+import StudentPersonalInformation from './modules/Student/PersonalInformation/PersonalInformation';
+import StudentCourses from './modules/Student/Courses/Courses';
 import Courses from './modules/Admin/Courses/Courses';
 import Teachers from './modules/Admin/Teachers/Teachers';
 import Students from './modules/Admin/Students/Students';
 import Departments from './modules/Admin/Departments/Departments';
 import Schools from './modules/Admin/Schools/Schools';
+import MyCourses from './modules/Student/Courses/MyCourses';
+import SelectCourse from './modules/Student/Courses/SelectCourse';
 
+const loadingOverlay = () => LoadingOverlay;
 const router = createBrowserRouter([
   {
     path: '/admin',
-    element: <Layout />,
+    Component: Layout,
     children: [
       {
         path: '',
-        element: <Navigate to="personal-info" />,
+        element: <Navigate to="/admin/personal-info" />,
       },
       {
         path: 'personal-info',
-        element: <PersonalInformation />,
+        Component: PersonalInformation,
       },
       {
         path: 'courses',
-        element: <Courses />,
+        Component: Courses,
       },
       {
         path: 'teachers',
-        element: <Teachers />,
+        Component: Teachers,
       },
       {
         path: 'students',
-        element: <Students />,
+        Component: Students,
       },
       {
         path: 'departments',
-        element: <Departments />,
+        Component: Departments,
       },
       {
         path: 'schools',
-        element: <Schools />,
+        Component: Schools,
+      },
+    ],
+  },
+  {
+    path: '/student',
+    Component: Layout,
+    children: [
+      {
+        path: '',
+        element: <Navigate to="/student/personal-info" />,
+      },
+      {
+        path: 'personal-info',
+        Component: StudentPersonalInformation,
+      },
+      {
+        path: 'courses',
+        Component: StudentCourses,
+      },
+      {
+        path: 'courses/:year/my-courses',
+        Component: MyCourses,
+        loader: loadingOverlay,
+      },
+      {
+        path: 'courses/:year/add-courses',
+        Component: SelectCourse,
+        loader: loadingOverlay,
       },
     ],
   },

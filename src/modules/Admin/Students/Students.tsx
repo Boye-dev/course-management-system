@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { useDisclosure } from '@mantine/hooks';
 import { Box, Button, Flex, Pill, Title } from '@mantine/core';
 import MantineTable from '@/shared/components/Table';
-import AddNewStudentDrawer from '@/components/Students/AddNewStudentDrawer';
-import EditStudentDrawer from '@/components/Students/EditStudentDrawer';
+import AddNewStudentDrawer from '@/components/Admin/Students/AddNewStudentDrawer';
+import EditStudentDrawer from '@/components/Admin/Students/EditStudentDrawer';
 import { IStudentDetails } from '@/interfaces/student.interface';
 
 interface ITableParams {
@@ -113,8 +113,16 @@ const Students = () => {
             { label: 'First Name', key: 'firstName' },
             { label: 'Last Name', key: 'lastName' },
             { label: 'Email', key: 'email' },
-            { label: 'Department', key: 'department', render: (val) => <Pill>{val.name} </Pill> },
-            { label: 'Status', key: 'status', render: (val) => <Pill>{val} </Pill> },
+            {
+              label: 'Department',
+              key: 'department',
+              render: (_row, val) => <Pill>{val.name} </Pill>,
+            },
+            {
+              label: 'Status',
+              key: 'status',
+              render: (_row: any, val: string) => <Pill>{val} </Pill>,
+            },
           ]}
           total={mockData.length}
           values={mockData}

@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { useDisclosure } from '@mantine/hooks';
 import { Box, Button, Flex, Title } from '@mantine/core';
 import MantineTable from '@/shared/components/Table';
-import AddNewSchoolDrawer from '@/components/Schools/AddNewSchoolDrawer';
-import EditSchoolDrawer from '@/components/Schools/EditSchoolDrawer';
+import AddNewSchoolDrawer from '@/components/Admin/Schools/AddNewSchoolDrawer';
+import EditSchoolDrawer from '@/components/Admin/Schools/EditSchoolDrawer';
 import { ISchoolDetails } from '@/interfaces/courses.interface';
 
 interface ITableParams {

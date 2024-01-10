@@ -5,6 +5,7 @@ export interface ICourseDetails {
   course_code: string;
   level: number;
   _id: string;
+  credit: number;
 }
 
 export interface IDepartmentDetails {
@@ -15,5 +16,12 @@ export interface IDepartmentDetails {
 
 export interface ISchoolDetails {
   name: string;
+  _id: string;
+}
+
+export interface IEnrolledCourseDetails {
+  course: ICourseDetails;
+  grade: string;
+  score: number;
   _id: string;
 }

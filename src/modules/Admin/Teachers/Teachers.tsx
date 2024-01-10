@@ -3,8 +3,8 @@ import { useDisclosure } from '@mantine/hooks';
 import { Box, Button, Flex, Pill, Title } from '@mantine/core';
 import MantineTable from '@/shared/components/Table';
 import { ITeacherDetails } from '@/interfaces/teachers.interface';
-import AddNewTeacherDrawer from '@/components/Teachers/AddNewTeacherDrawer';
-import EditTeacherDrawer from '@/components/Teachers/EditTeacherDrawer';
+import AddNewTeacherDrawer from '@/components/Admin/Teachers/AddNewTeacherDrawer';
+import EditTeacherDrawer from '@/components/Admin/Teachers/EditTeacherDrawer';
 
 interface ITableParams {
   page: number;
@@ -133,8 +133,12 @@ const Teachers = () => {
             { label: 'First Name', key: 'firstName' },
             { label: 'Last Name', key: 'lastName' },
             { label: 'Email', key: 'email' },
-            { label: 'Department', key: 'department', render: (val) => <Pill>{val.name} </Pill> },
-            { label: 'Status', key: 'status', render: (val) => <Pill>{val} </Pill> },
+            {
+              label: 'Department',
+              key: 'department',
+              render: (_row, val) => <Pill>{val.name}</Pill>,
+            },
+            { label: 'Status', key: 'status', render: (_row, val) => <Pill>{val} </Pill> },
           ]}
           total={mockData.length}
           values={mockData}

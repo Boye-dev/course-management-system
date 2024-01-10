@@ -19,7 +19,7 @@ import {
 } from '@tabler/icons-react';
 import SidebarItem from '../components/SidebarItem';
 import logo from '../../assets/images/babcock-logo.png';
-import { sidebarItems } from '@/constants/sidebarItems';
+import { studentSideBarItems } from '@/constants/sidebarItems';
 
 const Layout = () => {
   const theme = useMantineTheme();
@@ -27,7 +27,7 @@ const Layout = () => {
   const [collapsed, { toggle: collapseSidebar }] = useDisclosure();
 
   const renderSideItems = () =>
-    sidebarItems.map((item, index) => (
+    studentSideBarItems.map((item, index) => (
       <SidebarItem
         key={index}
         icon={item.icon}

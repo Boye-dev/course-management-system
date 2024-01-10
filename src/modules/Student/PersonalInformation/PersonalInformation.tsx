@@ -1,8 +1,9 @@
 import { Box, Button, Flex, Paper, Stack, Text, useMantineTheme } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import EditDetailsDrawer from '@/components/Profile/EditDetailsDrawer';
-import PasswordUpdateDrawer from '@/components/Profile/PasswordUpdateDrawer';
-import UserDetails from '@/components/Profile/UserDetails';
+import EditDetailsDrawer from '@/components/Admin/Profile/EditDetailsDrawer';
+import PasswordUpdateDrawer from '@/components/Admin/Profile/PasswordUpdateDrawer';
+import UserDetails from '@/components/Admin/Profile/UserDetails';
+import ExtraDetails from '@/components/Admin/Profile/ExtraDetails';
 
 const PersonalInformation = () => {
   const theme = useMantineTheme();
@@ -45,6 +46,9 @@ const PersonalInformation = () => {
 
         <Box w={{ xs: '100%', md: 400 }}>
           <UserDetails />
+          <Box mt={10}>
+            <ExtraDetails />
+          </Box>
         </Box>
       </Flex>
       <EditDetailsDrawer opened={edit} close={closeEdit} />

@@ -12,7 +12,7 @@ const SidebarItem = ({ text, icon: Icon, path, collapsed }: SidebarItemProps) =>
   const theme = useMantineTheme();
   const location = useLocation();
   const { hovered, ref } = useHover();
-  const isActive = location.pathname === path;
+  const isActive = location.pathname.startsWith(path);
   const navigate = useNavigate();
   return (
     <>
