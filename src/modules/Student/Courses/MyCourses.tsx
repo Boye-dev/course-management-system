@@ -37,6 +37,46 @@ const MyCourses = () => {
   const [modal, { open: openModal, close: closeModal }] = useDisclosure();
   const mockData: IEnrolledCourseDetails[] = [
     {
+      student: {
+        firstName: 'Oyelola',
+        lastName: 'Oyelola',
+        email: 'oyelola@gmail.com',
+        gender: 'MALE',
+        maritalStatus: 'Single',
+        nationality: 'Nigerian',
+        state: 'Lagos',
+        lga: 'Oyo',
+        _id: '123',
+        department: {
+          _id: '122',
+          school: {
+            name: 'Computer Science',
+            _id: '123',
+          },
+          name: 'Computer Science',
+        },
+        status: 'Active',
+      },
+      teacher: {
+        firstName: 'Oyelola',
+        lastName: 'Oyelola',
+        email: 'oyelola@gmail.com',
+        gender: 'MALE',
+        maritalStatus: 'Single',
+        nationality: 'Nigerian',
+        state: 'Lagos',
+        lga: 'Oyo',
+        _id: '123',
+        department: {
+          _id: '122',
+          school: {
+            name: 'Computer Science',
+            _id: '123',
+          },
+          name: 'Computer Science',
+        },
+        status: 'Active',
+      },
       course: {
         name: 'Compiler Constuction',
         course_code: 'COSC412',
@@ -56,132 +96,6 @@ const MyCourses = () => {
       _id: '123',
       score: 75,
       grade: 'A',
-    },
-    {
-      course: {
-        name: 'Compiler Constuction',
-        course_code: 'COSC412',
-        level: 4,
-        credit: 2,
-        _id: '1',
-        department: {
-          _id: '122',
-          school: {
-            name: 'Computer Science',
-            _id: '123',
-          },
-          name: 'Computer Science',
-        },
-        school: { _id: '124', name: 'Computer Science' },
-      },
-      _id: '123',
-      score: 75,
-      grade: 'A',
-    },
-    {
-      course: {
-        name: 'Compiler Constuction',
-        course_code: 'COSC412',
-        level: 4,
-        credit: 2,
-        _id: '1',
-        department: {
-          _id: '122',
-          school: {
-            name: 'Computer Science',
-            _id: '123',
-          },
-          name: 'Computer Science',
-        },
-        school: { _id: '124', name: 'Computer Science' },
-      },
-      _id: '123',
-      score: 75,
-      grade: 'A',
-    },
-    {
-      course: {
-        name: 'Compiler Constuction',
-        course_code: 'COSC412',
-        level: 4,
-        credit: 2,
-        _id: '1',
-        department: {
-          _id: '122',
-          school: {
-            name: 'Computer Science',
-            _id: '123',
-          },
-          name: 'Computer Science',
-        },
-        school: { _id: '124', name: 'Computer Science' },
-      },
-      score: 75,
-      _id: '123',
-      grade: 'A',
-    },
-    {
-      course: {
-        name: 'Compiler Constuction',
-        course_code: 'COSC412',
-        level: 4,
-        credit: 2,
-        _id: '1',
-        department: {
-          _id: '122',
-          school: {
-            name: 'Computer Science',
-            _id: '123',
-          },
-          name: 'Computer Science',
-        },
-        school: { _id: '124', name: 'Computer Science' },
-      },
-      score: 75,
-      _id: '123',
-      grade: 'A',
-    },
-    {
-      course: {
-        name: 'Compiler Constuction',
-        course_code: 'COSC412',
-        level: 4,
-        credit: 2,
-        _id: '1',
-        department: {
-          _id: '122',
-          school: {
-            name: 'Computer Science',
-            _id: '123',
-          },
-          name: 'Computer Science',
-        },
-        school: { _id: '124', name: 'Computer Science' },
-      },
-      score: 75,
-      _id: '123',
-      grade: 'A',
-    },
-    {
-      course: {
-        name: 'Compiler Constuction',
-        course_code: 'COSC412',
-        level: 4,
-        credit: 2,
-        _id: '1',
-        department: {
-          _id: '122',
-          school: {
-            name: 'Computer Science',
-            _id: '123',
-          },
-          name: 'Computer Science',
-        },
-        school: { _id: '124', name: 'Computer Science' },
-      },
-      score: 75,
-      grade: 'A',
-      _id: '123',
     },
   ];
   return (

@@ -11,7 +11,7 @@ import {
   useMantineTheme,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import {
   IconLayoutSidebarLeftCollapse,
   IconLayoutSidebarRightCollapse,
@@ -19,15 +19,24 @@ import {
 } from '@tabler/icons-react';
 import SidebarItem from '../components/SidebarItem';
 import logo from '../../assets/images/babcock-logo.png';
-import { studentSideBarItems } from '@/constants/sidebarItems';
+import {
+  adminSidebarItems,
+  studentSideBarItems,
+  teacherSideBarItems,
+} from '@/constants/sidebarItems';
 
 const Layout = () => {
   const theme = useMantineTheme();
   const [opened, { toggle }] = useDisclosure();
   const [collapsed, { toggle: collapseSidebar }] = useDisclosure();
-
+  const location = useLocation();
+  const sidebarItems = location.pathname.startsWith('/admin')
+    ? adminSidebarItems
+    : location.pathname.startsWith('/student')
+      ? studentSideBarItems
+      : teacherSideBarItems;
   const renderSideItems = () =>
-    studentSideBarItems.map((item, index) => (
+    sidebarItems.map((item, index) => (
       <SidebarItem
         key={index}
         icon={item.icon}
