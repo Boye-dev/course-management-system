@@ -13,7 +13,7 @@ const Courses = () => {
         </Flex>
         <Flex justify="space-between" align="center" wrap="wrap" gap={20}>
           <Paper
-            w={300}
+            w={{ xs: '100%', md: 300 }}
             h={100}
             shadow="xs"
             style={{ cursor: 'pointer' }}
@@ -26,8 +26,7 @@ const Courses = () => {
               </Text>
             </Flex>
           </Paper>
-
-          <Paper w={300} h={100} shadow="xs" style={{ cursor: 'pointer' }}>
+          <Paper w={{ xs: '100%', md: 300 }} h={100} shadow="xs" style={{ cursor: 'pointer' }}>
             <Flex align="center" justify="center" h="100%">
               <IconCertificate color={theme.colors.brandSecondary?.[9]} size={30} />
               <Text color={theme.colors.brandSecondary?.[9]} fz={25} ml={10} fw={600}>
@@ -35,7 +34,7 @@ const Courses = () => {
               </Text>
             </Flex>
           </Paper>
-          <Paper w={300} h={100} shadow="xs" style={{ cursor: 'pointer' }}>
+          <Paper w={{ xs: '100%', md: 300 }} h={100} shadow="xs" style={{ cursor: 'pointer' }}>
             <Flex align="center" justify="center" h="100%">
               <IconCertificate color={theme.colors.brandSecondary?.[9]} size={30} />
               <Text color={theme.colors.brandSecondary?.[9]} fz={25} ml={10} fw={600}>
@@ -43,7 +42,7 @@ const Courses = () => {
               </Text>
             </Flex>
           </Paper>
-          <Paper w={300} h={100} shadow="xs" style={{ cursor: 'pointer' }}>
+          <Paper w={{ xs: '100%', md: 300 }} h={100} shadow="xs" style={{ cursor: 'pointer' }}>
             <Flex align="center" justify="center" h="100%">
               <IconCertificate color={theme.colors.brandSecondary?.[9]} size={30} />
               <Text color={theme.colors.brandSecondary?.[9]} fz={25} ml={10} fw={600}>

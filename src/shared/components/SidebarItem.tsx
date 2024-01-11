@@ -1,22 +1,22 @@
 import React from 'react';
 import { Box, Center, Text, Tooltip, useMantineTheme } from '@mantine/core';
 import { useHover } from '@mantine/hooks';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { SidebarItemInterface } from '@/interfaces/layoutInterfaces';
 import classes from '../styles/Layout.module.css';
 
 type SidebarItemProps = Omit<SidebarItemInterface, 'roles'> & {
   collapsed: boolean;
+  onClick: () => void;
 };
-const SidebarItem = ({ text, icon: Icon, path, collapsed }: SidebarItemProps) => {
+const SidebarItem = ({ text, icon: Icon, path, collapsed, onClick }: SidebarItemProps) => {
   const theme = useMantineTheme();
   const location = useLocation();
   const { hovered, ref } = useHover();
   const isActive = location.pathname.startsWith(path);
-  const navigate = useNavigate();
   return (
     <>
-      <Tooltip label={text} hidden={!collapsed}>
+      <Tooltip label={text} hidden={!collapsed} zIndex={400}>
         <Center
           ref={ref}
           inline
@@ -26,19 +26,19 @@ const SidebarItem = ({ text, icon: Icon, path, collapsed }: SidebarItemProps) =>
           my={12}
           pl={20}
           bg={hovered || isActive ? 'rgba(20, 20, 20, 0.05)' : ''}
-          onClick={() => navigate(path)}
+          onClick={onClick}
         >
           <Icon color={hovered || isActive ? theme.colors.brandSecondary[9] : theme.white} />
-          {collapsed || (
-            <Text
-              c={hovered || isActive ? theme.colors.brandSecondary[9] : theme.white}
-              w="80%"
-              size="md"
-              fw={500}
-            >
-              {text}
-            </Text>
-          )}
+
+          <Text
+            c={hovered || isActive ? theme.colors.brandSecondary[9] : theme.white}
+            w="80%"
+            size="md"
+            display={{ xs: 'flex', md: collapsed ? 'none' : 'block' }}
+            fw={500}
+          >
+            {text}
+          </Text>
 
           <Box
             w={5}

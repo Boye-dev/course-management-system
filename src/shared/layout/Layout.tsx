@@ -11,7 +11,7 @@ import {
   useMantineTheme,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
   IconLayoutSidebarLeftCollapse,
   IconLayoutSidebarRightCollapse,
@@ -27,6 +27,7 @@ import {
 
 const Layout = () => {
   const theme = useMantineTheme();
+  const navigate = useNavigate();
   const [opened, { toggle }] = useDisclosure();
   const [collapsed, { toggle: collapseSidebar }] = useDisclosure();
   const location = useLocation();
@@ -38,6 +39,10 @@ const Layout = () => {
   const renderSideItems = () =>
     sidebarItems.map((item, index) => (
       <SidebarItem
+        onClick={() => {
+          navigate(item.path);
+          toggle();
+        }}
         key={index}
         icon={item.icon}
         text={item.text}
@@ -59,7 +64,7 @@ const Layout = () => {
       >
         <AppShell.Header
           w={{ xs: '100%', md: collapsed ? 'calc(100% - 80px)' : 'calc(100% - 300px)' }}
-          left={{ xs: 0, sm: 0, md: collapsed ? 80 : 300 }}
+          left={{ xs: 0, md: collapsed ? 80 : 300 }}
         >
           <Flex h="100%" w="100%">
             <Flex justify="center" align="center" pl={10}>
@@ -70,7 +75,12 @@ const Layout = () => {
               <Text mx={10}>Oyelola Adeboye</Text>
 
               <Tooltip label="Logout">
-                <Avatar color={theme.colors.red[1]} mx={10} style={{ cursor: 'pointer' }}>
+                <Avatar
+                  color={theme.colors.red[1]}
+                  mx={10}
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => navigate('/')}
+                >
                   <IconPower color={theme.colors.red[9]} />
                 </Avatar>
               </Tooltip>
@@ -78,12 +88,24 @@ const Layout = () => {
           </Flex>
         </AppShell.Header>
 
-        <AppShell.Navbar bg={theme.primaryColor} top={{ xs: 60, sm: 60, md: 0 }} h="100%" p={0}>
-          <Stack align="center" display="flex" style={{ position: 'relative' }}>
-            {collapsed || <Image src={logo} alt="logo" w={100} h={100} my={30} />}
+        <AppShell.Navbar
+          bg={theme.primaryColor}
+          top={{ xs: 60, md: 0 }}
+          h="100%"
+          p={0}
+          zIndex={300}
+        >
+          <Stack align="center" display="flex" style={{ position: 'relative' }} pt={50}>
+            <Image
+              src={logo}
+              alt="logo"
+              w={{ xs: 100, md: collapsed ? 60 : 100 }}
+              h={{ xs: 100, md: collapsed ? 60 : 100 }}
+              my={{ xs: 10, md: 10 }}
+            />
             <Flex
               align="center"
-              display="flex"
+              display={{ xs: 'none', md: 'flex' }}
               style={{
                 position: 'absolute',
                 right: 10,
@@ -103,7 +125,7 @@ const Layout = () => {
         </AppShell.Navbar>
 
         <AppShell.Main bg={theme.colors.gray[0]} mih="100vh">
-          <Box px={50}>
+          <Box px={{ xs: 5, md: 50 }}>
             <Outlet />
           </Box>
         </AppShell.Main>
