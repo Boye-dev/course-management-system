@@ -14,13 +14,14 @@ export interface ICourseDetails {
 
 export interface IDepartmentDetails {
   name: string;
-  school: ISchoolDetails;
+  school?: ISchoolDetails;
   _id: string;
 }
 
 export interface ISchoolDetails {
   name: string;
   _id: string;
+  code: string;
 }
 
 export interface IEnrolledCourseDetails {

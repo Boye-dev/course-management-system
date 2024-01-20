@@ -1,49 +1,41 @@
 import { useState } from 'react';
 import { useDisclosure } from '@mantine/hooks';
-import { Box, Button, Flex, Title } from '@mantine/core';
-import MantineTable from '@/shared/components/Table';
+import { Box, Button, Flex, Text, Title, useMantineTheme } from '@mantine/core';
+import { useQuery } from '@tanstack/react-query';
+import MantineTable, { ColumnHead } from '@/shared/components/Table';
 import AddNewSchoolDrawer from '@/components/Admin/Schools/AddNewSchoolDrawer';
 import EditSchoolDrawer from '@/components/Admin/Schools/EditSchoolDrawer';
 import { ISchoolDetails } from '@/interfaces/courses.interface';
-
-interface ITableParams {
-  page: number;
-  pageSize: string;
-  search?: string;
-}
+import { ISchoolParams, getSchools } from '@/services/school.service';
 
 const Schools = () => {
-  const [tableParams, setTableParams] = useState<ITableParams>({
+  const theme = useMantineTheme();
+  const [tableParams, setTableParams] = useState<ISchoolParams>({
     page: 0,
-    pageSize: '5',
+    pageSize: '10',
   });
+
   const [addNew, { open: openAddNew, close: closeAddNew }] = useDisclosure();
+  const [row, setRow] = useState<ISchoolDetails | undefined>();
   const [edit, { open: openEdit, close: closeEdit }] = useDisclosure();
-  const mockData: ISchoolDetails[] = [
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ['schools', tableParams],
+    queryFn: () => getSchools(tableParams),
+  });
+  const column: ColumnHead<ISchoolDetails> = [
     {
-      name: 'Computer Science',
-      _id: '123',
+      label: 'School Name',
+      key: 'name',
+      render: (_row, index, val) => (
+        <Text c={index % 2 !== 0 ? theme.colors.dark[9] : theme.white}>
+          {val
+            .split(' ')
+            .map((item: string) => item[0].toUpperCase() + item.substring(1))
+            .join(' ')}
+        </Text>
+      ),
     },
-    {
-      name: 'Computer Science',
-      _id: '123',
-    },
-    {
-      name: 'Computer Science',
-      _id: '123',
-    },
-    {
-      name: 'Computer Science',
-      _id: '123',
-    },
-    {
-      name: 'Computer Science',
-      _id: '123',
-    },
-    {
-      name: 'Computer Science',
-      _id: '123',
-    },
+    { label: 'School Code', key: 'code' },
   ];
   return (
     <>
@@ -53,18 +45,29 @@ const Schools = () => {
           <Button onClick={openAddNew}>Add New</Button>
         </Flex>
         <MantineTable<ISchoolDetails>
-          head={[{ label: 'School Name', key: 'name' }]}
-          total={mockData.length}
-          values={mockData}
+          head={column}
+          total={data?.total || 0}
+          values={data?.data || []}
           pageSize={tableParams.pageSize}
           page={tableParams.page}
-          onRowsPerPageChange={(val) => setTableParams({ ...tableParams, pageSize: val })}
+          onRowsPerPageChange={(val) => setTableParams({ ...tableParams, pageSize: val, page: 0 })}
           onPageChange={(val) => setTableParams({ ...tableParams, page: val })}
-          onRowItemClick={() => openEdit()}
+          onRowItemClick={(rowData) => {
+            setRow(rowData);
+            openEdit();
+          }}
+          loading={isLoading}
         />
 
-        <EditSchoolDrawer opened={edit} close={closeEdit} id="123" />
-        <AddNewSchoolDrawer opened={addNew} close={closeAddNew} />
+        <EditSchoolDrawer
+          opened={edit}
+          close={closeEdit}
+          row={row}
+          refetch={refetch}
+          clear={() => setRow(undefined)}
+        />
+
+        <AddNewSchoolDrawer opened={addNew} close={closeAddNew} refetch={refetch} />
       </Box>
     </>
   );

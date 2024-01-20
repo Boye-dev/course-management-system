@@ -1,9 +1,10 @@
-import { Checkbox, Paper, Table, TableProps, Text, useMantineTheme } from '@mantine/core';
+import { Checkbox, Flex, Paper, Table, TableProps, Text, useMantineTheme } from '@mantine/core';
 import React from 'react';
 import classes from '../styles/Table.module.css';
 import MantinePagination from './Pagination';
+import BabcockLoader from './BabcockLoader';
 
-interface CustomTableProps<T> extends TableProps {
+export interface CustomTableProps<T> extends TableProps {
   head: ColumnProps<keyof T, T>[];
   values: T[];
   checkbox?: boolean;
@@ -15,12 +16,15 @@ interface CustomTableProps<T> extends TableProps {
   page: number;
   selectedRows?: T[];
   setSelectedRows?: React.Dispatch<React.SetStateAction<T[]>>;
+  loading?: boolean;
 }
-interface ColumnProps<T, K> {
+export interface ColumnProps<T, K> {
   label: string;
   key: T;
-  render?: (_row: K, _val: any) => React.ReactNode;
+  render?: (_row: K, _index: number, _val: any) => React.ReactNode;
 }
+export type ColumnHead<T> = ColumnProps<keyof T, T>[];
+
 const MantineTable = <T,>({
   head,
   values,
@@ -33,6 +37,7 @@ const MantineTable = <T,>({
   page,
   selectedRows,
   setSelectedRows,
+  loading = false,
   ...props
 }: CustomTableProps<T>) => {
   const theme = useMantineTheme();
@@ -70,7 +75,7 @@ const MantineTable = <T,>({
         <>
           <Table.Td key={keyIndex}>
             {key.render ? (
-              key.render(item, item[key.key])
+              key.render(item, index + 1, item[key.key])
             ) : (
               <Text c={(index + 1) % 2 !== 0 ? theme.colors.dark[9] : theme.white}>
                 {item[key.key as keyof T] as React.ReactNode}
@@ -90,19 +95,32 @@ const MantineTable = <T,>({
             {checkbox && <Table.Th />}
             {tableHead}
           </Table.Tr>
-          {tableData}
+
+          {loading || (total > 0 && tableData)}
         </Table>
       </Table.ScrollContainer>
-
-      <MantinePagination
-        total={total}
-        rowsPerPageOptions={['5', '10', '20', '30', '50', '100']}
-        value={pageSize}
-        onRowsPerPageChange={onRowsPerPageChange}
-        page={page}
-        pageSize={parseInt(pageSize, 10)}
-        onPageChange={onPageChange}
-      />
+      {loading ? (
+        <Flex h={300} w="100%" align="center" justify="center">
+          <BabcockLoader h={300} w="100%" />
+        </Flex>
+      ) : (
+        total > 0 || (
+          <Flex h={300} w="100%" align="center" justify="center">
+            <Text>No Data</Text>
+          </Flex>
+        )
+      )}
+      {loading || (
+        <MantinePagination
+          total={total}
+          rowsPerPageOptions={['5', '10', '20', '30', '50', '100']}
+          value={pageSize}
+          onRowsPerPageChange={onRowsPerPageChange}
+          page={page}
+          pageSize={parseInt(pageSize, 10)}
+          onPageChange={onPageChange}
+        />
+      )}
     </Paper>
   );
 };

@@ -21,7 +21,7 @@ const PersonalInformation = () => {
 
   return isLoading ? (
     <BabcockLoader />
-  ) : (
+  ) : data ? (
     <>
       <Flex gap="xl" wrap="wrap" justify="center" w="100%">
         <Paper
@@ -56,12 +56,16 @@ const PersonalInformation = () => {
         </Paper>
 
         <Box w={{ xs: '100%', md: 400 }}>
-          <UserDetails data={data?.data} />
+          <UserDetails data={data} />
         </Box>
       </Flex>
-      <EditDetailsDrawer opened={edit} close={closeEdit} data={data?.data} refetch={refetch} />
+      <EditDetailsDrawer opened={edit} close={closeEdit} data={data} refetch={refetch} />
       <PasswordUpdateDrawer opened={passwordChange} close={closePasswordChange} />
     </>
+  ) : (
+    <Box>
+      <BabcockLoader />
+    </Box>
   );
 };
 
