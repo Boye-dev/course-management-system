@@ -26,7 +26,7 @@ Api.interceptors.request.use(async (req: InternalAxiosRequestConfig) => {
   const response = await axios.post(`${templateBaseUrl}/api/auth/refresh`, {
     refresh: Auth.getRefreshToken(),
   });
-  Auth.setToken(response.data);
+  Auth.setToken(response.data.accessToken);
   const updatedConfig = { ...req };
   if (Auth.getToken()) {
     updatedConfig.headers.Authorization = `Bearer ${Auth.getToken()}`;
