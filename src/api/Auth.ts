@@ -1,4 +1,5 @@
 import { JwtPayload, jwtDecode } from 'jwt-decode';
+import { Roles } from '@/constants/roles';
 
 export interface IUserDecoded extends JwtPayload {
   email: string;
@@ -8,7 +9,7 @@ export interface IUserDecoded extends JwtPayload {
   jti: string;
   phone: string;
   role: string;
-  user_id: string;
+  id: string;
 }
 
 function setToken(token: string) {
@@ -35,11 +36,39 @@ export function getDecodedJwt(tkn = ''): IUserDecoded {
     return {} as IUserDecoded;
   }
 }
-
+export function getDecodedRefreshJwt(tkn = ''): IUserDecoded {
+  try {
+    const token = getRefreshToken();
+    const t = token || tkn;
+    return jwtDecode(t);
+  } catch (error) {
+    return {} as IUserDecoded;
+  }
+}
 function isAuthenticated() {
   try {
     const decodedToken = getDecodedJwt();
-    if (decodedToken && decodedToken.user_id) {
+
+    if (decodedToken && decodedToken.id) {
+      const { exp } = decodedToken;
+
+      if (exp) {
+        return exp * 1000 > Date.now();
+      }
+
+      return true;
+    }
+
+    return false;
+  } catch (e) {
+    return false;
+  }
+}
+function isAuthenticatedAdmin() {
+  try {
+    const decodedToken = getDecodedJwt();
+
+    if (decodedToken && decodedToken.id && decodedToken.role === Roles.ADMIN) {
       const { exp } = decodedToken;
 
       if (exp) {
@@ -68,6 +97,8 @@ const Auth = {
   setRefreshToken,
   setToken,
   removeToken,
+  isAuthenticatedAdmin,
+  getDecodedRefreshJwt,
 };
 
 export default Auth;

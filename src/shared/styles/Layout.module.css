@@ -3,3 +3,25 @@
     cursor: pointer;
 }
 
+
+.loader{
+animation: loader 2s infinite ease-in-out;
+}
+
+@keyframes loader {
+    0%{
+        scale:0.8;
+        opacity:0.8;
+    }
+
+    50%{
+        scale: 1;
+        opacity: 1;
+    }
+    
+    100%{
+        scale: 0.8;
+        opacity: 0.8;
+    }
+    
+}

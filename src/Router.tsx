@@ -14,7 +14,8 @@ import Schools from './modules/Admin/Schools/Schools';
 import MyCourses from './modules/Student/Courses/MyCourses';
 import SelectCourse from './modules/Student/Courses/SelectCourse';
 import MyStudents from './modules/Teacher/Courses/MyStudents';
-import Login from './pages/Login.page';
+import Login from './pages/Auth/Login.page';
+import AdminProtectedRoutes from './shared/components/Auth/AdminProtectedRoutes';
 
 const loadingOverlay = () => LoadingOverlay;
 const router = createBrowserRouter([
@@ -22,7 +23,11 @@ const router = createBrowserRouter([
   { path: '/login', Component: Login },
   {
     path: '/admin',
-    Component: Layout,
+    element: (
+      <>
+        <AdminProtectedRoutes />
+      </>
+    ),
     children: [
       {
         path: '',

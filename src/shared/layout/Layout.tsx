@@ -24,6 +24,7 @@ import {
   studentSideBarItems,
   teacherSideBarItems,
 } from '@/constants/sidebarItems';
+import Auth from '@/api/Auth';
 
 const Layout = () => {
   const theme = useMantineTheme();
@@ -79,7 +80,10 @@ const Layout = () => {
                   color={theme.colors.red[1]}
                   mx={10}
                   style={{ cursor: 'pointer' }}
-                  onClick={() => navigate('/')}
+                  onClick={() => {
+                    Auth.removeToken();
+                    navigate('/');
+                  }}
                 >
                   <IconPower color={theme.colors.red[9]} />
                 </Avatar>
@@ -93,7 +97,7 @@ const Layout = () => {
           top={{ xs: 60, md: 0 }}
           h="100%"
           p={0}
-          zIndex={300}
+          zIndex={100}
         >
           <Stack align="center" display="flex" style={{ position: 'relative' }} pt={50}>
             <Image

@@ -1,6 +1,7 @@
 import { Avatar, Box, Center, Divider, Paper, Stack, Text, useMantineTheme } from '@mantine/core';
-
+import dayjs from 'dayjs';
 import {
+  IconBabyBottle,
   IconFlag,
   IconFlag2,
   IconHeart,
@@ -9,14 +10,15 @@ import {
   IconPennant,
   IconUser,
 } from '@tabler/icons-react';
+import { IUser } from '@/interfaces/auth.interface';
 
-const UserDetails = () => {
+const UserDetails = ({ data }: { data?: IUser }) => {
   const theme = useMantineTheme();
   return (
     <>
       <Paper py={20} w="100%">
         <Stack align="center" my={10}>
-          <Avatar size="xl" />
+          <Avatar size="xl" src={data?.profilePicture} />
         </Stack>
 
         <Box my={30} px={30}>
@@ -26,7 +28,9 @@ const UserDetails = () => {
               Full Name
             </Text>
           </Center>
-          <Text>Oyelola Adeboye</Text>
+          <Text>
+            {data?.lastName} {data?.middleName} {data?.firstName}
+          </Text>
         </Box>
 
         <Box my={30} px={30}>
@@ -36,7 +40,7 @@ const UserDetails = () => {
               Email
             </Text>
           </Center>
-          <Text>oyelola@gmail.com</Text>
+          <Text>{data?.email}</Text>
         </Box>
 
         <Box my={30} px={30}>
@@ -46,7 +50,16 @@ const UserDetails = () => {
               Gender
             </Text>
           </Center>
-          <Text>Gender</Text>
+          <Text>{data?.gender}</Text>
+        </Box>
+        <Box my={30} px={30}>
+          <Center inline>
+            <IconBabyBottle color={theme.colors.brandSecondary[9]} />
+            <Text c={theme.colors.brandSecondary[9]} ml={6}>
+              DOB
+            </Text>
+          </Center>
+          <Text>{dayjs(data?.dateOfBirth).format('MMM DD, YYYY')}</Text>
         </Box>
         <Box my={30} px={30}>
           <Center inline>
@@ -55,7 +68,7 @@ const UserDetails = () => {
               Marital Status
             </Text>
           </Center>
-          <Text>Marital Status</Text>
+          <Text>{data?.relationshipStatus}</Text>
         </Box>
         <Divider />
 
@@ -66,7 +79,7 @@ const UserDetails = () => {
               Nationality
             </Text>
           </Center>
-          <Text>Nigeria</Text>
+          <Text>{data?.nationality}</Text>
         </Box>
 
         <Box my={30} px={30}>
@@ -76,7 +89,7 @@ const UserDetails = () => {
               State
             </Text>
           </Center>
-          <Text>Oyo</Text>
+          <Text>{data?.state}</Text>
         </Box>
 
         <Box my={30} px={30}>
@@ -86,7 +99,17 @@ const UserDetails = () => {
               LGA
             </Text>
           </Center>
-          <Text>Ogbomosho South</Text>
+          <Text>{data?.lga}</Text>
+        </Box>
+
+        <Box my={30} px={30}>
+          <Center inline>
+            <IconFlag2 color={theme.colors.brandSecondary[9]} />
+            <Text c={theme.colors.brandSecondary[9]} ml={6}>
+              Address
+            </Text>
+          </Center>
+          <Text>{data?.address}</Text>
         </Box>
       </Paper>
     </>
