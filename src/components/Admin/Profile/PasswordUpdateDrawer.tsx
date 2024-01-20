@@ -7,7 +7,7 @@ import { notifications } from '@mantine/notifications';
 import { IDrawerProps } from '@/interfaces/helperInterface';
 import { getDecodedJwt } from '@/api/Auth';
 import { updatePassword } from '@/services/admin.services';
-import { hadleErrors } from '@/utils/handleErrors';
+import { handleErrors } from '@/utils/handleErrors';
 
 const PasswordUpdateDrawer = ({ opened, close }: IDrawerProps) => {
   const decodedUser = getDecodedJwt();
@@ -47,7 +47,7 @@ const PasswordUpdateDrawer = ({ opened, close }: IDrawerProps) => {
       close();
     },
     onError: (error) => {
-      hadleErrors(error, 'Error Updating Password');
+      handleErrors(error, 'Error Updating Password');
     },
   });
 

@@ -14,7 +14,6 @@ import { useForm } from '@mantine/form';
 import { zodResolver } from 'mantine-form-zod-resolver';
 import { z } from 'zod';
 import dayjs from 'dayjs';
-import { AxiosResponse } from 'axios';
 import { DateInput } from '@mantine/dates';
 import { notifications } from '@mantine/notifications';
 import { QueryObserverResult, RefetchOptions, useMutation } from '@tanstack/react-query';
@@ -22,7 +21,7 @@ import { IDrawerProps } from '@/interfaces/helperInterface';
 import { GenderEnum, IUser, RelationshipStatusEnum } from '@/interfaces/auth.interface';
 import { updatePersonalInfo } from '@/services/admin.services';
 import { getDecodedJwt } from '@/api/Auth';
-import { hadleErrors } from '@/utils/handleErrors';
+import { handleErrors } from '@/utils/handleErrors';
 import useStateAndLGA from '@/hooks/useStateAndLga';
 
 const EditDetailsDrawer = ({
@@ -34,7 +33,7 @@ const EditDetailsDrawer = ({
   data?: IUser;
   refetch?: (
     options?: RefetchOptions | undefined
-  ) => Promise<QueryObserverResult<AxiosResponse<IUser, any>, Error>>;
+  ) => Promise<QueryObserverResult<void | IUser, Error>>;
 }) => {
   const decodedUser = getDecodedJwt();
 
@@ -76,7 +75,7 @@ const EditDetailsDrawer = ({
       close();
     },
     onError: (error) => {
-      hadleErrors(error, 'Error Updating Profile');
+      handleErrors(error, 'Error Updating Profile');
     },
   });
 

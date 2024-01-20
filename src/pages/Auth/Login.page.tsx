@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
-import { AxiosError } from 'axios';
 import {
   Button,
   Flex,
@@ -21,6 +20,7 @@ import { IOtpInterface, LoginInterface } from '@/interfaces/auth.interface';
 import { login, verifyOtp } from '@/services/auth.service';
 import Auth from '@/api/Auth';
 import { Roles } from '@/constants/roles';
+import { handleErrors } from '@/utils/handleErrors';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -55,13 +55,7 @@ const Login = () => {
       setShowOtp(true);
     },
     onError: (error) => {
-      if (error instanceof AxiosError) {
-        notifications.show({
-          title: error?.response?.data.error,
-          message: error?.response?.data.message,
-          color: 'red',
-        });
-      }
+      handleErrors(error);
     },
   });
   const { mutate: verifyOtpMutation, isPending: isVerifyingOtp } = useMutation({
@@ -83,13 +77,7 @@ const Login = () => {
       }
     },
     onError: (error) => {
-      if (error instanceof AxiosError) {
-        notifications.show({
-          title: error?.response?.data.error,
-          message: error?.response?.data.message,
-          color: 'red',
-        });
-      }
+      handleErrors(error);
     },
   });
   const submitLogin = (values: LoginInterface) => {

@@ -4,7 +4,8 @@ import { Roles } from '@/constants/roles';
 export interface IUserDecoded extends JwtPayload {
   email: string;
   exp: number;
-  fullname: string;
+  firstName: string;
+  lastName: string;
   iat: number;
   jti: string;
   phone: string;

@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import {
-  ActionIcon,
+  // ActionIcon,
   Box,
   Button,
   Flex,
   Group,
-  Menu,
+  // Menu,
   Modal,
   Stack,
   Text,
@@ -15,89 +15,27 @@ import {
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useNavigate } from 'react-router-dom';
-import { IconDotsVertical } from '@tabler/icons-react';
-import MantineTable from '@/shared/components/Table';
+// import { IconDotsVertical } from '@tabler/icons-react';
+// import MantineTable from '@/shared/components/Table';
 import { IEnrolledCourseDetails } from '@/interfaces/courses.interface';
 
-interface ITableParams {
-  page: number;
-  pageSize: string;
+// interface ITableParams {
+//   page: number;
+//   pageSize: string;
 
-  search?: string;
-}
+//   search?: string;
+// }
 
 const MyCourses = () => {
   const theme = useMantineTheme();
-  const [tableParams, setTableParams] = useState<ITableParams>({
-    page: 0,
-    pageSize: '5',
-  });
+  // const [tableParams, setTableParams] = useState<ITableParams>({
+  //   page: 0,
+  //   pageSize: '5',
+  // });
   const navigate = useNavigate();
   const [, setSelectedRow] = useState<IEnrolledCourseDetails | {}>();
-  const [modal, { open: openModal, close: closeModal }] = useDisclosure();
-  const mockData: IEnrolledCourseDetails[] = [
-    {
-      student: {
-        firstName: 'Oyelola',
-        lastName: 'Oyelola',
-        email: 'oyelola@gmail.com',
-        gender: 'MALE',
-        maritalStatus: 'Single',
-        nationality: 'Nigerian',
-        state: 'Lagos',
-        lga: 'Oyo',
-        _id: '123',
-        department: {
-          _id: '122',
-          school: {
-            name: 'Computer Science',
-            _id: '123',
-          },
-          name: 'Computer Science',
-        },
-        status: 'Active',
-      },
-      teacher: {
-        firstName: 'Oyelola',
-        lastName: 'Oyelola',
-        email: 'oyelola@gmail.com',
-        gender: 'MALE',
-        maritalStatus: 'Single',
-        nationality: 'Nigerian',
-        state: 'Lagos',
-        lga: 'Oyo',
-        _id: '123',
-        department: {
-          _id: '122',
-          school: {
-            name: 'Computer Science',
-            _id: '123',
-          },
-          name: 'Computer Science',
-        },
-        status: 'Active',
-      },
-      course: {
-        name: 'Compiler Constuction',
-        course_code: 'COSC412',
-        level: 4,
-        credit: 2,
-        _id: '1',
-        department: {
-          _id: '122',
-          school: {
-            name: 'Computer Science',
-            _id: '123',
-          },
-          name: 'Computer Science',
-        },
-        school: { _id: '124', name: 'Computer Science' },
-      },
-      _id: '123',
-      score: 75,
-      grade: 'A',
-    },
-  ];
+  const [modal, { close: closeModal }] = useDisclosure();
+
   return (
     <>
       <Box>
@@ -111,7 +49,7 @@ const MyCourses = () => {
             <Button onClick={() => navigate('/student/courses/1/add-courses')}>Add New</Button>
           </Tooltip>
         </Flex>
-        <MantineTable<IEnrolledCourseDetails>
+        {/* <MantineTable<IEnrolledCourseDetails>
           head={[
             { label: 'Course Name', key: 'course', render: (_row, val) => val.name },
             { label: 'Course Code', key: 'course', render: (_row, val) => val.course_code },
@@ -154,7 +92,7 @@ const MyCourses = () => {
           page={tableParams.page}
           onRowsPerPageChange={(val) => setTableParams({ ...tableParams, pageSize: val })}
           onPageChange={(val) => setTableParams({ ...tableParams, page: val })}
-        />
+        /> */}
 
         <Modal opened={modal} onClose={closeModal} withCloseButton={false} centered>
           <Stack h={200} justify="space-evenly">

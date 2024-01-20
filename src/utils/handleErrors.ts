@@ -1,7 +1,7 @@
 import { notifications } from '@mantine/notifications';
 import { AxiosError } from 'axios';
 
-export const hadleErrors = (error: any, title?: string) => {
+export const handleErrors = (error: any, title?: string) => {
   if (error instanceof AxiosError) {
     const errorMessgaes: string[] = [];
     const mainError = error.response?.data;
