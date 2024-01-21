@@ -1,19 +1,11 @@
 import Api from '@/api/Api';
 import { ISchoolDetails } from '@/interfaces/courses.interface';
+import { ApiResponse, ITableParams } from '@/interfaces/helperInterface';
 import { handleErrors } from '@/utils/handleErrors';
-import { IQueryParams, queryParamsHelper } from '@/utils/query-params';
+import { queryParamsHelper } from '@/utils/query-params';
 
-export interface ApiSchoolResponse {
-  total: number;
-  page: number;
-  pageSize: number;
+export interface ApiSchoolResponse extends ApiResponse {
   data: ISchoolDetails[];
-}
-
-export interface ITableParams extends IQueryParams {
-  page: number;
-  pageSize: string;
-  search?: string;
 }
 
 export interface ISchoolParams extends ITableParams {
@@ -29,7 +21,7 @@ interface IPatchSchoolPayload {
   formData: IAddSchoolPayload;
   id: string;
 }
-export const getSchools = async (queryParams: ISchoolParams) => {
+export const getSchools = async (queryParams?: ISchoolParams) => {
   try {
     const res = await Api.get<ApiSchoolResponse>(`/api/school/${queryParamsHelper(queryParams)}`);
     if (res) {

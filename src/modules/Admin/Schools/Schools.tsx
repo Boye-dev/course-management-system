@@ -18,7 +18,7 @@ const Schools = () => {
   const [addNew, { open: openAddNew, close: closeAddNew }] = useDisclosure();
   const [row, setRow] = useState<ISchoolDetails | undefined>();
   const [edit, { open: openEdit, close: closeEdit }] = useDisclosure();
-  const { data, isLoading, refetch } = useQuery({
+  const { data, isFetching, refetch } = useQuery({
     queryKey: ['schools', tableParams],
     queryFn: () => getSchools(tableParams),
   });
@@ -56,7 +56,7 @@ const Schools = () => {
             setRow(rowData);
             openEdit();
           }}
-          loading={isLoading}
+          loading={isFetching}
         />
 
         <EditSchoolDrawer

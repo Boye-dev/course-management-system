@@ -44,8 +44,8 @@ const EditSchoolDrawer = ({ opened, close, row, refetch, clear }: EditDrawerProp
     mutationFn: editSchoolMutation,
     onSuccess: () => {
       notifications.show({
-        title: 'School added Successfull',
-        message: 'A new school has been added successfull',
+        title: 'School updated Successfull',
+        message: 'A school has been updated successfully',
         color: 'green',
       });
       refetch();

@@ -2,7 +2,7 @@ export type IQueryParams = {
   [key: string]: string | number | boolean | null | string[] | undefined;
 };
 
-export const queryParamsHelper = (queryParams: IQueryParams): string => {
+export const queryParamsHelper = (queryParams?: IQueryParams): string => {
   const validParams: string[] = [];
 
   // eslint-disable-next-line no-restricted-syntax
