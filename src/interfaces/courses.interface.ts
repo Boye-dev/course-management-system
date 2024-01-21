@@ -14,8 +14,10 @@ export interface ICourseDetails {
 
 export interface IDepartmentDetails {
   name: string;
-  school?: ISchoolDetails;
+  school: ISchoolDetails;
   _id: string;
+  code: string;
+  yearsTaken: number;
 }
 
 export interface ISchoolDetails {

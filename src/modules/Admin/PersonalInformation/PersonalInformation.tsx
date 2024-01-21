@@ -14,12 +14,12 @@ const PersonalInformation = () => {
   const [edit, { open: openEdit, close: closeEdit }] = useDisclosure(false);
   const [passwordChange, { open: openPasswordChange, close: closePasswordChange }] =
     useDisclosure(false);
-  const { data, isLoading, refetch } = useQuery({
+  const { data, isFetching, refetch } = useQuery({
     queryKey: ['personal-info'],
     queryFn: () => getPersonalInfo(decodedUser.id),
   });
 
-  return isLoading ? (
+  return isFetching ? (
     <BabcockLoader />
   ) : data ? (
     <>

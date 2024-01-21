@@ -1,4 +1,13 @@
-import { Checkbox, Flex, Paper, Table, TableProps, Text, useMantineTheme } from '@mantine/core';
+import {
+  Checkbox,
+  Divider,
+  Flex,
+  Paper,
+  Table,
+  TableProps,
+  Text,
+  useMantineTheme,
+} from '@mantine/core';
 import React from 'react';
 import classes from '../styles/Table.module.css';
 import MantinePagination from './Pagination';
@@ -110,6 +119,7 @@ const MantineTable = <T,>({
           </Flex>
         )
       )}
+      {total <= 0 && <Divider />}
       {loading || (
         <MantinePagination
           total={total}
