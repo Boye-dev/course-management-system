@@ -1,4 +1,5 @@
 import { Roles } from '@/constants/roles';
+import { IDepartmentDetails } from './courses.interface';
 
 export interface LoginInterface {
   username: string;
@@ -59,11 +60,15 @@ export interface IUser {
 
   lga: string;
 
-  department?: string;
+  department?: IDepartmentDetails;
 
   school?: string;
 
   registrationStatus?: Record<string, string[]>;
 
   yearOfAdmission?: number;
+
+  _id: string;
+
+  status: string;
 }

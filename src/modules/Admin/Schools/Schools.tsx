@@ -7,6 +7,7 @@ import AddNewSchoolDrawer from '@/components/Admin/Schools/AddNewSchoolDrawer';
 import EditSchoolDrawer from '@/components/Admin/Schools/EditSchoolDrawer';
 import { ISchoolDetails } from '@/interfaces/courses.interface';
 import { ISchoolParams, getSchools } from '@/services/school.service';
+import { convertAllLowercaseToSentenceCase } from '@/utils/textHelpers';
 
 const Schools = () => {
   const theme = useMantineTheme();
@@ -28,10 +29,7 @@ const Schools = () => {
       key: 'name',
       render: (_row, index, val) => (
         <Text c={index % 2 !== 0 ? theme.colors.dark[9] : theme.white}>
-          {val
-            .split(' ')
-            .map((item: string) => item[0].toUpperCase() + item.substring(1))
-            .join(' ')}
+          {convertAllLowercaseToSentenceCase(val)}
         </Text>
       ),
     },

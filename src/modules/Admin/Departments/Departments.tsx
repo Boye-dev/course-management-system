@@ -7,6 +7,7 @@ import AddNewDepartmentDrawer from '@/components/Admin/Departments/AddNewDepartm
 import EditDepartmentDrawer from '@/components/Admin/Departments/EditDepartmentDrawer';
 import { IDepartmentDetails } from '@/interfaces/courses.interface';
 import { IDepartmentParams, getDepartments } from '@/services/department.service';
+import { convertAllLowercaseToSentenceCase } from '@/utils/textHelpers';
 
 const Departments = () => {
   const theme = useMantineTheme();
@@ -18,7 +19,7 @@ const Departments = () => {
   const [row, setRow] = useState<IDepartmentDetails | undefined>();
   const [edit, { open: openEdit, close: closeEdit }] = useDisclosure();
   const { data, refetch, isFetching } = useQuery({
-    queryKey: ['schools', tableParams],
+    queryKey: ['departments', tableParams],
     queryFn: () => getDepartments(tableParams),
   });
   const column: ColumnHead<IDepartmentDetails> = [
@@ -27,10 +28,7 @@ const Departments = () => {
       key: 'name',
       render: (_row, index, val) => (
         <Text c={index % 2 !== 0 ? theme.colors.dark[9] : theme.white}>
-          {val
-            .split(' ')
-            .map((item: string) => item[0].toUpperCase() + item.substring(1))
-            .join(' ')}
+          {convertAllLowercaseToSentenceCase(val)}
         </Text>
       ),
     },
@@ -40,10 +38,7 @@ const Departments = () => {
       key: 'school',
       render: (val, index, schoolDetails) => (
         <Text c={index % 2 !== 0 ? theme.colors.dark[9] : theme.white}>
-          {schoolDetails?.name
-            .split(' ')
-            .map((item: string) => item[0].toUpperCase() + item.substring(1))
-            .join(' ')}
+          {convertAllLowercaseToSentenceCase(schoolDetails?.name)}
         </Text>
       ),
     },

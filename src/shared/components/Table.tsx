@@ -53,48 +53,51 @@ const MantineTable = <T,>({
 
   const tableHead = head.map((item, index) => <Table.Th key={index}>{item.label}</Table.Th>);
 
-  const tableData = values?.map((item, index) => (
-    <Table.Tr
-      key={index + 1}
-      className={classes.row_hover}
-      onClick={() => onRowItemClick && onRowItemClick(item)}
-      style={{
-        cursor: 'pointer',
-        backgroundColor: (index + 1) % 2 === 0 ? theme.colors.brandSecondary[7] : '',
-      }}
-    >
-      {checkbox && selectedRows && setSelectedRows && (
-        <Table.Td>
-          <Checkbox
-            style={{ cursor: 'pointer', zIndex: 100 }}
-            checked={
-              selectedRows.find((val) => JSON.stringify(val) === JSON.stringify(item)) !== undefined
-            }
-            onChange={(event) => {
-              setSelectedRows(
-                event.currentTarget.checked
-                  ? [...selectedRows, item]
-                  : selectedRows.filter((val) => JSON.stringify(val) !== JSON.stringify(item))
-              );
-            }}
-          />
-        </Table.Td>
-      )}
-      {head.map((key, keyIndex) => (
-        <>
-          <Table.Td key={keyIndex}>
-            {key.render ? (
-              key.render(item, index + 1, item[key.key])
-            ) : (
-              <Text c={(index + 1) % 2 !== 0 ? theme.colors.dark[9] : theme.white}>
-                {item[key.key as keyof T] as React.ReactNode}
-              </Text>
-            )}
+  const tableData =
+    loading ||
+    values?.map((item, index) => (
+      <Table.Tr
+        key={index + 1}
+        className={classes.row_hover}
+        onClick={() => onRowItemClick && onRowItemClick(item)}
+        style={{
+          cursor: 'pointer',
+          backgroundColor: (index + 1) % 2 === 0 ? theme.colors.brandSecondary[7] : '',
+        }}
+      >
+        {checkbox && selectedRows && setSelectedRows && (
+          <Table.Td>
+            <Checkbox
+              style={{ cursor: 'pointer', zIndex: 100 }}
+              checked={
+                selectedRows.find((val) => JSON.stringify(val) === JSON.stringify(item)) !==
+                undefined
+              }
+              onChange={(event) => {
+                setSelectedRows(
+                  event.currentTarget.checked
+                    ? [...selectedRows, item]
+                    : selectedRows.filter((val) => JSON.stringify(val) !== JSON.stringify(item))
+                );
+              }}
+            />
           </Table.Td>
-        </>
-      ))}
-    </Table.Tr>
-  ));
+        )}
+        {head.map((key, keyIndex) => (
+          <>
+            <Table.Td key={keyIndex}>
+              {key.render ? (
+                key.render(item, index + 1, item[key.key])
+              ) : (
+                <Text c={(index + 1) % 2 !== 0 ? theme.colors.dark[9] : theme.white}>
+                  {item[key.key as keyof T] as React.ReactNode}
+                </Text>
+              )}
+            </Table.Td>
+          </>
+        ))}
+      </Table.Tr>
+    ));
 
   return (
     <Paper p={10} shadow="xs" mah="calc(100vh - 60px)">
@@ -119,17 +122,19 @@ const MantineTable = <T,>({
           </Flex>
         )
       )}
-      {total <= 0 && <Divider />}
       {loading || (
-        <MantinePagination
-          total={total}
-          rowsPerPageOptions={['5', '10', '20', '30', '50', '100']}
-          value={pageSize}
-          onRowsPerPageChange={onRowsPerPageChange}
-          page={page}
-          pageSize={parseInt(pageSize, 10)}
-          onPageChange={onPageChange}
-        />
+        <>
+          {total <= 0 && <Divider />}
+          <MantinePagination
+            total={total}
+            rowsPerPageOptions={['5', '10', '20', '30', '50', '100']}
+            value={pageSize}
+            onRowsPerPageChange={onRowsPerPageChange}
+            page={page}
+            pageSize={parseInt(pageSize, 10)}
+            onPageChange={onPageChange}
+          />
+        </>
       )}
     </Paper>
   );
