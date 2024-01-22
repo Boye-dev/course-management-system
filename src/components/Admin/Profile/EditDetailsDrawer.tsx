@@ -39,6 +39,19 @@ const EditDetailsDrawer = ({
 
   const [file, setFile] = useState<File | null>(null);
   const schema = z.object({
+    firstName: z.string().min(1, { message: 'First name is required' }),
+    lastName: z.string().min(1, { message: 'Last name is required' }),
+    middleName: z.string().min(1, { message: 'Middle name is required' }),
+    gender: z.string().min(1, { message: 'Gender is required' }),
+    relationshipStatus: z.string().min(1, { message: 'Marital Status is required' }),
+    nationality: z.string().min(1, { message: 'Nationality is required' }),
+
+    state: z.string().min(1, { message: 'State is required' }),
+    lga: z.string().min(1, { message: 'LGA is required' }),
+
+    address: z.string().min(1, { message: 'Address is required' }),
+
+    dateOfBirth: z.date(),
     phoneNumber: z
       .string()
       .min(11, { message: 'Phone Number Must Be 11 Digits' })

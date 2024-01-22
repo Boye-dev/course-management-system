@@ -23,7 +23,7 @@ interface IPatchDepartmentPayload {
   formData: Omit<IAddDepartmentPayload, 'school' | 'yearsTaken'>;
   id: string;
 }
-export const getDepartments = async (queryParams: IDepartmentParams) => {
+export const getDepartments = async (queryParams?: IDepartmentParams) => {
   try {
     const res = await Api.get<ApiDepartmentsResponse>(
       `/api/department/${queryParamsHelper(queryParams)}`

@@ -99,7 +99,17 @@ const Layout = () => {
           p={0}
           zIndex={100}
         >
-          <Stack align="center" display="flex" style={{ position: 'relative' }} pt={50}>
+          <Stack
+            align="center"
+            display="flex"
+            pt={50}
+            style={{
+              maxHeight: '80dvh',
+              minHeight: '80dvh',
+              overflowY: 'auto',
+              position: 'relative',
+            }}
+          >
             <Image
               src={logo}
               alt="logo"

@@ -7,6 +7,7 @@ import { IDrawerProps } from '@/interfaces/helperInterface';
 import { ApiDepartmentsResponse, addDepartmentMutation } from '@/services/department.service';
 import { getSchools } from '@/services/school.service';
 import { handleErrors } from '@/utils/handleErrors';
+import { convertAllLowercaseToSentenceCase } from '@/utils/textHelpers';
 
 const AddNewDepartmentDrawer = ({
   opened,
@@ -23,15 +24,8 @@ const AddNewDepartmentDrawer = ({
       .string()
       .min(4, 'Department Code must be 4 character')
       .max(4, 'Department Code must be 4 character'),
-    yearsTaken: z
-      .number()
-      .min(1, 'Years Taken is required')
-      .refine((val) => typeof val === 'string', { message: 'Years Taken is required' }),
-
-    school: z
-      .string({ required_error: 'School is required' })
-      .min(1, 'School is required')
-      .refine((val) => val === null, { message: 'School is required' }),
+    yearsTaken: z.number().min(1, 'Years Taken is required'),
+    school: z.string({ required_error: 'School is required' }).min(1, 'School is required'),
   });
   const form = useForm({
     initialValues: {
@@ -111,10 +105,7 @@ const AddNewDepartmentDrawer = ({
                 isFetching
                   ? [{ value: 'Fetching Schools', label: 'Fetching Schools', disabled: true }]
                   : data?.data?.map((school) => ({
-                      label: school?.name
-                        .split(' ')
-                        .map((item: string) => item[0].toUpperCase() + item.substring(1))
-                        .join(' '),
+                      label: convertAllLowercaseToSentenceCase(school?.name),
                       value: school?._id,
                     })) || []
               }

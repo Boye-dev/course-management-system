@@ -1,30 +1,67 @@
-// import { useState } from 'react';
+import { useState } from 'react';
 import { useDisclosure } from '@mantine/hooks';
-import {
-  Box,
-  Button,
-  Flex,
-  //  Pill,
-  Title,
-} from '@mantine/core';
-// import MantineTable from '@/shared/components/Table';
-// import { ITeacherDetails } from '@/interfaces/teachers.interface';
+import { Avatar, Box, Button, Flex, Pill, Text, Title, useMantineTheme } from '@mantine/core';
+import { useQuery } from '@tanstack/react-query';
+import MantineTable, { ColumnHead } from '@/shared/components/Table';
+import { IUser } from '@/interfaces/auth.interface';
+import { getStatusColor } from '@/utils/getStatusColor';
 import AddNewTeacherDrawer from '@/components/Admin/Teachers/AddNewTeacherDrawer';
 import EditTeacherDrawer from '@/components/Admin/Teachers/EditTeacherDrawer';
-
-// interface ITableParams {
-//   page: number;
-//   pageSize: string;
-//   search?: string;
-// }
+import {
+  convertAllLowercaseToSentenceCase,
+  convertAllUpperCaseToSentenceCase,
+} from '@/utils/textHelpers';
+import { ITeacherParams, getTeachers } from '@/services/teacher.service';
 
 const Teachers = () => {
-  // const [tableParams, setTableParams] = useState<ITableParams>({
-  //   page: 0,
-  //   pageSize: '5',
-  // });
+  const theme = useMantineTheme();
+  const [tableParams, setTableParams] = useState<ITeacherParams>({
+    page: 0,
+    pageSize: '10',
+  });
   const [addNew, { open: openAddNew, close: closeAddNew }] = useDisclosure();
-  const [edit, { close: closeEdit }] = useDisclosure();
+  const [row, setRow] = useState<IUser | undefined>();
+  const [edit, { open: openEdit, close: closeEdit }] = useDisclosure();
+  const { data, refetch, isFetching } = useQuery({
+    queryKey: ['teachers', tableParams],
+    queryFn: () => getTeachers(tableParams),
+  });
+
+  const column: ColumnHead<IUser> = [
+    {
+      label: '',
+      key: 'profilePicture',
+      render: (_row, index, pic) => <Avatar src={pic} />,
+    },
+
+    {
+      label: 'Full Name',
+      key: 'firstName',
+      render: (_row, index) => (
+        <Text c={index % 2 !== 0 ? theme.colors.dark[9] : theme.white}>
+          {_row.lastName} {_row.middleName} {_row.firstName}
+        </Text>
+      ),
+    },
+    { label: 'Email', key: 'email' },
+    {
+      label: 'Department',
+      key: 'department',
+      render: (_row, index, departmentDetails) => (
+        <Text c={index % 2 !== 0 ? theme.colors.dark[9] : theme.white}>
+          {convertAllLowercaseToSentenceCase(departmentDetails?.name)}
+        </Text>
+      ),
+    },
+    { label: 'Gender', key: 'gender' },
+    {
+      label: 'Status',
+      key: 'status',
+      render: (_row, _index, status) => (
+        <Pill c={getStatusColor(status)}>{convertAllUpperCaseToSentenceCase(status)}</Pill>
+      ),
+    },
+  ];
 
   return (
     <>
@@ -33,29 +70,29 @@ const Teachers = () => {
           <Title my={30}>Teachers</Title>
           <Button onClick={openAddNew}>Add New</Button>
         </Flex>
-        {/* <MantineTable<ITeacherDetails>
-          head={[
-            { label: 'First Name', key: 'firstName' },
-            { label: 'Last Name', key: 'lastName' },
-            { label: 'Email', key: 'email' },
-            {
-              label: 'Department',
-              key: 'department',
-              render: (_row, val) => <Pill>{val.name}</Pill>,
-            },
-            { label: 'Status', key: 'status', render: (_row, val) => <Pill>{val} </Pill> },
-          ]}
-          total={mockData.length}
-          values={mockData}
+        <MantineTable<IUser>
+          head={column}
+          total={data?.total || 0}
+          values={data?.data || []}
           pageSize={tableParams.pageSize}
           page={tableParams.page}
-          onRowsPerPageChange={(val) => setTableParams({ ...tableParams, pageSize: val })}
+          onRowsPerPageChange={(val) => setTableParams({ ...tableParams, pageSize: val, page: 0 })}
           onPageChange={(val) => setTableParams({ ...tableParams, page: val })}
-          onRowItemClick={() => openEdit()}
-        /> */}
+          onRowItemClick={(rowData) => {
+            setRow(rowData);
+            openEdit();
+          }}
+          loading={isFetching}
+        />
 
-        <EditTeacherDrawer opened={edit} close={closeEdit} id="123" />
-        <AddNewTeacherDrawer opened={addNew} close={closeAddNew} />
+        <EditTeacherDrawer
+          opened={edit}
+          close={closeEdit}
+          row={row}
+          refetch={refetch}
+          clear={() => setRow(undefined)}
+        />
+        <AddNewTeacherDrawer opened={addNew} close={closeAddNew} refetch={refetch} />
       </Box>
     </>
   );
