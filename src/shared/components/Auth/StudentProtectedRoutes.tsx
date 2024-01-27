@@ -4,10 +4,10 @@ import Layout from '@/shared/layout/Layout';
 import BabcockLoader from '../BabcockLoader';
 import { Roles } from '@/constants/roles';
 
-const AdminProtectedRoutes = () => {
-  const { loading, authenticated } = useRoleAuthentication(Roles.ADMIN);
+const StudentProtectedRoutes = () => {
+  const { loading, authenticated } = useRoleAuthentication(Roles.TEACHER);
 
   return loading ? <BabcockLoader /> : authenticated ? <Layout /> : <Navigate to="/login" />;
 };
 
-export default AdminProtectedRoutes;
+export default StudentProtectedRoutes;

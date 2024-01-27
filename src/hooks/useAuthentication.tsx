@@ -2,9 +2,8 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import Auth, { getDecodedJwt, getDecodedRefreshJwt } from '@/api/Auth';
 import { templateBaseUrl } from '@/constants';
-import { Roles } from '@/constants/roles';
 
-const useAdminAuthentication = () => {
+const useAuthentication = (): { loading: boolean; authenticated: boolean } => {
   const [loading, setLoading] = useState(true);
   const [authenticated, setAuthenticated] = useState(false);
   const decodedToken = getDecodedJwt();
@@ -17,7 +16,7 @@ const useAdminAuthentication = () => {
     setLoading(false);
   };
   useEffect(() => {
-    if (decodedToken && decodedToken.id && decodedToken.role === Roles.ADMIN) {
+    if (decodedToken && decodedToken.id) {
       const { exp } = decodedToken;
 
       if (exp) {
@@ -55,4 +54,4 @@ const useAdminAuthentication = () => {
   return { loading, authenticated };
 };
 
-export default useAdminAuthentication;
+export default useAuthentication;

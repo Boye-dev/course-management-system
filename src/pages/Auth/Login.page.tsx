@@ -13,28 +13,34 @@ import {
   useMantineTheme,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { useForm } from '@mantine/form';
+import { useForm, zodResolver } from '@mantine/form';
 import { useMutation } from '@tanstack/react-query';
+import { z } from 'zod';
 import logo from '@/assets/images/babcock-logo.png';
 import { IOtpInterface, LoginInterface } from '@/interfaces/auth.interface';
 import { login, verifyOtp } from '@/services/auth.service';
 import Auth from '@/api/Auth';
 import { Roles } from '@/constants/roles';
 import { handleErrors } from '@/utils/handleErrors';
+import useAuthentication from '@/hooks/useAuthentication';
+import BabcockLoader from '@/shared/components/BabcockLoader';
 
 const Login = () => {
+  const { loading, authenticated } = useAuthentication();
+
   const navigate = useNavigate();
   const theme = useMantineTheme();
   const [showOtp, setShowOtp] = useState<boolean>(false);
+  const schema = z.object({
+    username: z.string().email({ message: 'Invalid Email Address' }),
+    password: z.string().min(6, 'Password must be greater than 6'),
+  });
   const form = useForm<LoginInterface>({
     initialValues: {
       username: '',
       password: '',
     },
-    validate: {
-      username: (value) => (/^\S+@\S+$/.test(value) ? null : 'Invalid email'),
-      password: (value) => (value.trim().length < 8 ? 'Password must be greater than 8' : null),
-    },
+    validate: zodResolver(schema),
   });
   const otpForm = useForm<IOtpInterface>({
     initialValues: {
@@ -70,10 +76,10 @@ const Login = () => {
       Auth.setToken(tokenData?.data?.accessToken);
       Auth.setRefreshToken(tokenData?.data?.refreshToken);
       if (data?.data.role === Roles.ADMIN) {
-        navigate('/admin/students');
+        navigate('/admin/personal-info');
       }
       if (data?.data.role === Roles.TEACHER) {
-        navigate('/teacher/courses');
+        navigate('/teacher/personal-info');
       }
     },
     onError: (error) => {
@@ -94,10 +100,15 @@ const Login = () => {
     if (Auth.getDecodedJwt().role === Roles.ADMIN) {
       return '/admin/personal-info';
     }
+    if (Auth.getDecodedJwt().role === Roles.TEACHER) {
+      return '/teacher/personal-info';
+    }
     return '';
   };
 
-  return Auth.isAuthenticated() ? (
+  return loading ? (
+    <BabcockLoader />
+  ) : authenticated ? (
     <Navigate to={getUrl()} />
   ) : (
     <>

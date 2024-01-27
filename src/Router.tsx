@@ -1,6 +1,5 @@
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom';
 import { LoadingOverlay } from '@mantine/core';
-import Layout from './shared/layout/Layout';
 import PersonalInformation from './modules/Admin/PersonalInformation/PersonalInformation';
 import StudentPersonalInformation from './modules/Student/PersonalInformation/PersonalInformation';
 import TeacherPersonalInformation from './modules/Teacher/PersonalInformation/PersonalInformation';
@@ -16,6 +15,7 @@ import SelectCourse from './modules/Student/Courses/SelectCourse';
 import MyStudents from './modules/Teacher/Courses/MyStudents';
 import Login from './pages/Auth/Login.page';
 import AdminProtectedRoutes from './shared/components/Auth/AdminProtectedRoutes';
+import StudentProtectedRoutes from './shared/components/Auth/StudentProtectedRoutes';
 
 const loadingOverlay = () => LoadingOverlay;
 const router = createBrowserRouter([
@@ -23,11 +23,7 @@ const router = createBrowserRouter([
   { path: '/login', Component: Login },
   {
     path: '/admin',
-    element: (
-      <>
-        <AdminProtectedRoutes />
-      </>
-    ),
+    element: <AdminProtectedRoutes />,
     children: [
       {
         path: '',
@@ -61,7 +57,7 @@ const router = createBrowserRouter([
   },
   {
     path: '/student',
-    Component: Layout,
+    element: <AdminProtectedRoutes />,
     children: [
       {
         path: '',
@@ -89,7 +85,7 @@ const router = createBrowserRouter([
   },
   {
     path: '/teacher',
-    Component: Layout,
+    element: <StudentProtectedRoutes />,
     children: [
       {
         path: '',

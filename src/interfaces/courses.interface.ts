@@ -1,15 +1,13 @@
-/* eslint-disable import/no-cycle */
-// import { IStudentDetails } from './student.interface';
-import { ITeacherDetails } from './teachers.interface';
+// eslint-disable-next-line import/no-cycle
+import { IUser } from './auth.interface';
 
 export interface ICourseDetails {
   name: string;
-  department: IDepartmentDetails;
-  school: ISchoolDetails;
-  course_code: string;
-  level: number;
   _id: string;
-  credit: number;
+  code: string;
+  yearTaken: number;
+  units: number;
+  department: IDepartmentDetails;
 }
 
 export interface IDepartmentDetails {
@@ -28,9 +26,5 @@ export interface ISchoolDetails {
 
 export interface IEnrolledCourseDetails {
   course: ICourseDetails;
-  // student: IStudentDetails;
-  teacher: ITeacherDetails;
-  grade: string;
-  score: number;
-  _id: string;
+  teacher: IUser;
 }

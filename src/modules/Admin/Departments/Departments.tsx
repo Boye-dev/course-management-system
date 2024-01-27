@@ -47,7 +47,7 @@ const Departments = () => {
       key: 'yearsTaken',
       render: (_val, index, item) => (
         <Text c={index % 2 !== 0 ? theme.colors.dark[9] : theme.white}>
-          {`${item}year${item > 0 && 's'}`}
+          {`${item}year${item > 0 ? 's' : ''}`}
         </Text>
       ),
     },

@@ -1,5 +1,6 @@
 import { Roles } from '@/constants/roles';
-import { IDepartmentDetails } from './courses.interface';
+// eslint-disable-next-line import/no-cycle
+import { IDepartmentDetails, ISchoolDetails } from './courses.interface';
 
 export interface LoginInterface {
   username: string;
@@ -62,7 +63,7 @@ export interface IUser {
 
   department?: IDepartmentDetails;
 
-  school?: string;
+  school?: ISchoolDetails;
 
   registrationStatus?: Record<string, string[]>;
 

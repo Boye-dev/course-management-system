@@ -2,7 +2,7 @@ import { Box, Center, Paper, Text, useMantineTheme } from '@mantine/core';
 
 import { IconBackpack, IconSchool } from '@tabler/icons-react';
 
-const ExtraDetails = () => {
+const ExtraDetails = ({ school, department }: { school: string; department: string }) => {
   const theme = useMantineTheme();
   return (
     <>
@@ -14,7 +14,7 @@ const ExtraDetails = () => {
               Department
             </Text>
           </Center>
-          <Text>Computer Science</Text>
+          <Text>{department}</Text>
         </Box>
 
         <Box my={30} px={30}>
@@ -24,7 +24,7 @@ const ExtraDetails = () => {
               School
             </Text>
           </Center>
-          <Text>Computer Science</Text>
+          <Text>{school}</Text>
         </Box>
       </Paper>
     </>

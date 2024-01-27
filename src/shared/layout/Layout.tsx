@@ -102,10 +102,9 @@ const Layout = () => {
           <Stack
             align="center"
             display="flex"
-            pt={50}
+            pt={20}
+            pb={30}
             style={{
-              maxHeight: '80dvh',
-              minHeight: '80dvh',
               overflowY: 'auto',
               position: 'relative',
             }}

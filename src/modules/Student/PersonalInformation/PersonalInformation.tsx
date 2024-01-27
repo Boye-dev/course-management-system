@@ -3,7 +3,7 @@ import { useDisclosure } from '@mantine/hooks';
 import EditDetailsDrawer from '@/components/Admin/Profile/EditDetailsDrawer';
 import PasswordUpdateDrawer from '@/components/Admin/Profile/PasswordUpdateDrawer';
 import UserDetails from '@/components/Admin/Profile/UserDetails';
-import ExtraDetails from '@/components/Admin/Profile/ExtraDetails';
+// import ExtraDetails from '@/components/Admin/Profile/ExtraDetails';
 
 const PersonalInformation = () => {
   const theme = useMantineTheme();
@@ -46,9 +46,7 @@ const PersonalInformation = () => {
 
         <Box w={{ xs: '100%', md: 400 }}>
           <UserDetails />
-          <Box mt={10}>
-            <ExtraDetails />
-          </Box>
+          <Box mt={10}>{/* <ExtraDetails /> */}</Box>
         </Box>
       </Flex>
       <EditDetailsDrawer opened={edit} close={closeEdit} />
