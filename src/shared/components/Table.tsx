@@ -26,6 +26,7 @@ export interface CustomTableProps<T> extends TableProps {
   selectedRows?: T[];
   setSelectedRows?: React.Dispatch<React.SetStateAction<T[]>>;
   loading?: boolean;
+  showPagination?: boolean;
 }
 export interface ColumnProps<T, K> {
   label: string;
@@ -47,17 +48,20 @@ const MantineTable = <T,>({
   selectedRows,
   setSelectedRows,
   loading = false,
+  showPagination = true,
   ...props
 }: CustomTableProps<T>) => {
   const theme = useMantineTheme();
 
-  const tableHead = head.map((item, index) => <Table.Th key={index}>{item.label}</Table.Th>);
+  const tableHead = head.map((item, index) => (
+    <Table.Th key={`${item.key.toString()}${index}`}>{item.label}</Table.Th>
+  ));
 
   const tableData =
     loading ||
     values?.map((item, index) => (
       <Table.Tr
-        key={index + 1}
+        key={`${item}${index}`}
         className={classes.row_hover}
         onClick={() => onRowItemClick && onRowItemClick(item)}
         style={{
@@ -85,7 +89,7 @@ const MantineTable = <T,>({
         )}
         {head.map((key, keyIndex) => (
           <>
-            <Table.Td key={keyIndex}>
+            <Table.Td key={`${key.key.toString()}${keyIndex}`}>
               {key.render ? (
                 key.render(item, index + 1, item[key.key])
               ) : (
@@ -103,12 +107,13 @@ const MantineTable = <T,>({
     <Paper p={10} shadow="xs" mah="calc(100vh - 60px)">
       <Table.ScrollContainer minWidth="100%">
         <Table {...props}>
-          <Table.Tr>
-            {checkbox && <Table.Th />}
-            {tableHead}
-          </Table.Tr>
-
-          {loading || (total > 0 && tableData)}
+          <Table.Thead>
+            <Table.Tr>
+              {checkbox && <Table.Th />}
+              {tableHead}
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>{loading || (total > 0 && tableData)}</Table.Tbody>
         </Table>
       </Table.ScrollContainer>
       {loading ? (
@@ -125,15 +130,17 @@ const MantineTable = <T,>({
       {loading || (
         <>
           {total <= 0 && <Divider />}
-          <MantinePagination
-            total={total}
-            rowsPerPageOptions={['5', '10', '20', '30', '50', '100']}
-            value={pageSize}
-            onRowsPerPageChange={onRowsPerPageChange}
-            page={page}
-            pageSize={parseInt(pageSize, 10)}
-            onPageChange={onPageChange}
-          />
+          {showPagination && (
+            <MantinePagination
+              total={total}
+              rowsPerPageOptions={['5', '10', '20', '30', '50', '100']}
+              value={pageSize}
+              onRowsPerPageChange={onRowsPerPageChange}
+              page={page}
+              pageSize={parseInt(pageSize, 10)}
+              onPageChange={onPageChange}
+            />
+          )}
         </>
       )}
     </Paper>

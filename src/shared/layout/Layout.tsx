@@ -24,13 +24,14 @@ import {
   studentSideBarItems,
   teacherSideBarItems,
 } from '@/constants/sidebarItems';
-import Auth from '@/api/Auth';
+import Auth, { getDecodedJwt } from '@/api/Auth';
 
 const Layout = () => {
   const theme = useMantineTheme();
   const navigate = useNavigate();
   const [opened, { toggle }] = useDisclosure();
   const [collapsed, { toggle: collapseSidebar }] = useDisclosure();
+  const decodedUser = getDecodedJwt();
   const location = useLocation();
   const sidebarItems = location.pathname.startsWith('/admin')
     ? adminSidebarItems
@@ -73,7 +74,9 @@ const Layout = () => {
             </Flex>
             <Flex w="100%" h="100%" justify="flex-end" align="center" display="flex">
               <Avatar radius="xl" alt="Profile Image" mx={10} />
-              <Text mx={10}>Oyelola Adeboye</Text>
+              <Text mx={10}>
+                {decodedUser.lastName} {decodedUser.firstName}
+              </Text>
 
               <Tooltip label="Logout">
                 <Avatar

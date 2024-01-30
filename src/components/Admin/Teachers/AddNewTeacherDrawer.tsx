@@ -1,9 +1,11 @@
 import {
   Avatar,
   Button,
+  Center,
   Drawer,
   FileButton,
   Group,
+  Loader,
   PasswordInput,
   Select,
   Text,
@@ -12,19 +14,31 @@ import {
 } from '@mantine/core';
 import { z } from 'zod';
 import { useForm, zodResolver } from '@mantine/form';
-import { QueryObserverResult, RefetchOptions, useMutation, useQuery } from '@tanstack/react-query';
+import {
+  QueryObserverResult,
+  RefetchOptions,
+  useInfiniteQuery,
+  useMutation,
+} from '@tanstack/react-query';
+import { useInView } from 'react-intersection-observer';
 import { DateInput } from '@mantine/dates';
 import dayjs from 'dayjs';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useDebouncedValue } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { IDrawerProps } from '@/interfaces/helperInterface';
 import useStateAndLGA from '@/hooks/useStateAndLga';
 import { handleErrors } from '@/utils/handleErrors';
 import { GenderEnum, RelationshipStatusEnum } from '@/interfaces/auth.interface';
-import { getDepartments } from '@/services/department.service';
+import {
+  ApiDepartmentsResponse,
+  IDepartmentParams,
+  getDepartments,
+} from '@/services/department.service';
 import { convertAllLowercaseToSentenceCase } from '@/utils/textHelpers';
 import { ApiTeachersResponse, addTeacher } from '@/services/teacher.service';
 import { Roles } from '@/constants/roles';
+import { SelectRender } from '@/shared/components/SelectRender';
 
 const AddNewTeacherDrawer = ({
   opened,
@@ -35,6 +49,7 @@ const AddNewTeacherDrawer = ({
     options?: RefetchOptions | undefined
   ) => Promise<QueryObserverResult<void | ApiTeachersResponse, Error>>;
 }) => {
+  const { ref, inView } = useInView();
   const [file, setFile] = useState<File | null>(null);
   const schema = z
     .object({
@@ -65,11 +80,62 @@ const AddNewTeacherDrawer = ({
       message: 'Password must be the same',
     });
 
-  const { data, isFetching } = useQuery({
-    queryKey: ['departments'],
-    queryFn: () => getDepartments(),
-    enabled: opened,
+  const [search, setSearch] = useState('');
+  const [debounced] = useDebouncedValue(search, 200);
+  const [tableParams, setTableParams] = useState<IDepartmentParams>({
+    page: 0,
+    pageSize: '10',
+    search,
+    searchBy: ['name'],
   });
+
+  useEffect(() => {
+    setTableParams({ ...tableParams, search: debounced.length > 0 ? debounced : '' });
+  }, [debounced]);
+  const { fetchNextPage, hasNextPage, isFetchingNextPage, isFetching, data } = useInfiniteQuery({
+    queryKey: ['departments-infinite', tableParams],
+
+    enabled: opened,
+    queryFn: ({ pageParam }) => getDepartments({ ...tableParams, page: pageParam }),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage: any, pages: any) => {
+      const totalItems = lastPage?.total;
+      const itemsLoaded = pages.reduce(
+        (total: number, page: ApiDepartmentsResponse) => total + page.data.length,
+        0
+      );
+
+      if (itemsLoaded < totalItems) {
+        return pages.length;
+      }
+
+      return undefined;
+    },
+  });
+  useEffect(() => {
+    if (inView && hasNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, fetchNextPage, hasNextPage]);
+  const departmentsData =
+    data?.pages
+      .flatMap((page) => page.data)
+      ?.map((course, i) => {
+        if (data?.pages.flatMap((page) => page.data).length === i + 1) {
+          return {
+            render: () => <Text ref={ref}>{convertAllLowercaseToSentenceCase(course?.name)}</Text>,
+            label: `${convertAllLowercaseToSentenceCase(course?.name)}`,
+            value: course?._id,
+            disabled: false,
+          };
+        }
+        return {
+          render: () => <Text>{convertAllLowercaseToSentenceCase(course?.name)}</Text>,
+          label: `${convertAllLowercaseToSentenceCase(course?.name)}`,
+          value: course?._id,
+          disabled: false,
+        };
+      }) || [];
   const form = useForm({
     initialValues: {
       firstName: '',
@@ -235,21 +301,35 @@ const AddNewTeacherDrawer = ({
             my={20}
             {...form.getInputProps('address')}
           />
-          <Select
-            searchable
-            nothingFoundMessage="No Department..."
+          <SelectRender
+            maxDropdownHeight={300}
+            label="Departments"
+            search={search}
+            setSearch={setSearch}
+            placeholder="Departments"
             data={
-              isFetching
-                ? [{ value: 'Fetching Departments', label: 'Fetching Departments', disabled: true }]
-                : data?.data?.map((department) => ({
-                    label: convertAllLowercaseToSentenceCase(department?.name),
-                    value: department?._id,
-                  })) || []
+              isFetching && isFetchingNextPage
+                ? departmentsData?.concat({
+                    label: 'Fetching More',
+                    disabled: true,
+                    value: 'Fetching More',
+                    render: () => (
+                      <Center inline>
+                        <Loader size="sm" />
+                        <Text>Fetching More</Text>
+                      </Center>
+                    ),
+                  })
+                : isFetching
+                  ? [
+                      {
+                        value: 'Fetching Departments',
+                        label: 'Fetching Departments',
+                        disabled: true,
+                      },
+                    ]
+                  : departmentsData || []
             }
-            label="Department"
-            placeholder="Department"
-            size="md"
-            my={20}
             {...form.getInputProps('department')}
           />
           <PasswordInput

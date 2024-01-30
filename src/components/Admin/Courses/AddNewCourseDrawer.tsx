@@ -222,6 +222,7 @@ const AddNewCourseDrawer = ({
                       ]
                     : departmentsData || []
               }
+              {...form.getInputProps('department')}
             />
           </Box>
           <Group justify="end" pos="sticky" bottom={0} bg="white" p={10} style={{ zIndex: '100' }}>

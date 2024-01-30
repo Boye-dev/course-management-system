@@ -202,6 +202,7 @@ const AddNewDepartmentDrawer = ({
                       ]
                     : schoolData || []
               }
+              {...form.getInputProps('school')}
             />
           </Box>
           <Group justify="end" pos="sticky" bottom={0} bg="white" p={10} style={{ zIndex: '100' }}>

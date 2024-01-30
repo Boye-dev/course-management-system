@@ -27,4 +27,15 @@ export interface ISchoolDetails {
 export interface IEnrolledCourseDetails {
   course: ICourseDetails;
   teacher: IUser;
+  _id: string;
+}
+
+export interface IMyCourse {
+  course: IEnrolledCourseDetails;
+  score: number;
+  year: string;
+  _id: string;
+  grade: string;
+  gp: string;
+  student: IUser;
 }

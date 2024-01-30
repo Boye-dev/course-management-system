@@ -14,6 +14,7 @@ const Courses = () => {
   const [tableParams, setTableParams] = useState<ICourseParams>({
     page: 0,
     pageSize: '10',
+    sortBy: 'yearTaken',
   });
   const [addNew, { open: openAddNew, close: closeAddNew }] = useDisclosure();
   const [row, setRow] = useState<ICourseDetails | undefined>();

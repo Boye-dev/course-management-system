@@ -81,6 +81,9 @@ const Login = () => {
       if (data?.data.role === Roles.TEACHER) {
         navigate('/teacher/personal-info');
       }
+      if (data?.data.role === Roles.STUDENT) {
+        navigate('/student/personal-info');
+      }
     },
     onError: (error) => {
       handleErrors(error);
@@ -102,6 +105,9 @@ const Login = () => {
     }
     if (Auth.getDecodedJwt().role === Roles.TEACHER) {
       return '/teacher/personal-info';
+    }
+    if (Auth.getDecodedJwt().role === Roles.STUDENT) {
+      return '/student/personal-info';
     }
     return '';
   };

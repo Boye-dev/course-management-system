@@ -7,6 +7,7 @@ import {
   Text,
   useCombobox,
 } from '@mantine/core';
+import { GetInputPropsReturnType } from '@mantine/form/lib/types';
 
 import { useEffect, useState } from 'react';
 
@@ -23,7 +24,8 @@ export function SelectRender({
   maxDropdownHeight,
   search,
   setSearch,
-}: {
+  ...formProps
+}: GetInputPropsReturnType & {
   data: OptionProps[];
   placeholder: string;
   label: string;
@@ -71,6 +73,7 @@ export function SelectRender({
       store={combobox}
       withinPortal={false}
       onOptionSubmit={(val) => {
+        formProps.onChange(val);
         setValue(val);
         combobox.closeDropdown();
       }}
@@ -78,6 +81,7 @@ export function SelectRender({
       <Text fw={500}>{label}</Text>
       <Combobox.Target>
         <InputBase
+          error={formProps.error}
           size="md"
           rightSection={<Combobox.Chevron />}
           value={search}

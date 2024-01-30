@@ -9,6 +9,8 @@ export interface ITableParams extends IQueryParams {
   page: number;
   pageSize: string;
   search?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
 }
 
 export interface ApiResponse {

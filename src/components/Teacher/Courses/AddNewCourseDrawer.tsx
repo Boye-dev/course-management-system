@@ -131,7 +131,7 @@ const AddNewCourseDrawer = ({
         <form onSubmit={form.onSubmit((values) => addCourse(values))}>
           <Box h="76dvh">
             <MultiSelectRender
-              maxDropdownHeight={300}
+              maxDropdownHeight={250}
               label="Courses"
               search={search}
               setSearch={setSearch}
@@ -159,6 +159,7 @@ const AddNewCourseDrawer = ({
                       ]
                     : coursesData || []
               }
+              {...form.getInputProps('courses')}
             />
           </Box>
           <Group justify="end" pos="sticky" bottom={0} bg="white" p={10} style={{ zIndex: '100' }}>

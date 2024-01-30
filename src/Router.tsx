@@ -1,7 +1,6 @@
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom';
 import { LoadingOverlay } from '@mantine/core';
 import PersonalInformation from './modules/Admin/PersonalInformation/PersonalInformation';
-import StudentPersonalInformation from './modules/Student/PersonalInformation/PersonalInformation';
 import TeacherPersonalInformation from './modules/Teacher/PersonalInformation/PersonalInformation';
 import StudentCourses from './modules/Student/Courses/Courses';
 import TeacherCourses from './modules/Teacher/Courses/Courses';
@@ -16,6 +15,8 @@ import MyStudents from './modules/Teacher/Courses/MyStudents';
 import Login from './pages/Auth/Login.page';
 import AdminProtectedRoutes from './shared/components/Auth/AdminProtectedRoutes';
 import StudentProtectedRoutes from './shared/components/Auth/StudentProtectedRoutes';
+import TeacherProtectedRoutes from './shared/components/Auth/TeacherProtectedRoutes';
+import Years from './modules/Teacher/Courses/Years';
 
 const loadingOverlay = () => LoadingOverlay;
 const router = createBrowserRouter([
@@ -57,7 +58,7 @@ const router = createBrowserRouter([
   },
   {
     path: '/student',
-    element: <AdminProtectedRoutes />,
+    element: <StudentProtectedRoutes />,
     children: [
       {
         path: '',
@@ -65,7 +66,7 @@ const router = createBrowserRouter([
       },
       {
         path: 'personal-info',
-        Component: StudentPersonalInformation,
+        Component: TeacherPersonalInformation,
       },
       {
         path: 'courses',
@@ -85,7 +86,7 @@ const router = createBrowserRouter([
   },
   {
     path: '/teacher',
-    element: <StudentProtectedRoutes />,
+    element: <TeacherProtectedRoutes />,
     children: [
       {
         path: '',
@@ -100,7 +101,11 @@ const router = createBrowserRouter([
         Component: TeacherCourses,
       },
       {
-        path: 'courses/:id/my-students',
+        path: 'courses/:id',
+        Component: Years,
+      },
+      {
+        path: 'courses/:id/:year/my-students',
         Component: MyStudents,
         loader: loadingOverlay,
       },

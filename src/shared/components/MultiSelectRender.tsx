@@ -8,7 +8,8 @@ import {
   Text,
   useCombobox,
 } from '@mantine/core';
-import { useState } from 'react';
+import { GetInputPropsReturnType } from '@mantine/form/lib/types';
+import { useEffect, useState } from 'react';
 import { OptionProps } from './SelectRender';
 
 export function MultiSelectRender({
@@ -18,7 +19,8 @@ export function MultiSelectRender({
   maxDropdownHeight,
   search,
   setSearch,
-}: {
+  ...formProps
+}: GetInputPropsReturnType & {
   data: OptionProps[];
   placeholder: string;
   label: string;
@@ -37,7 +39,9 @@ export function MultiSelectRender({
     setValue((current) =>
       current.includes(val) ? current.filter((v) => v !== val) : [...current, val]
     );
-
+  useEffect(() => {
+    formProps.onChange(value);
+  }, [value]);
   const handleValueRemove = (val: string) =>
     setValue((current) => current.filter((v) => v !== val));
 
@@ -57,7 +61,7 @@ export function MultiSelectRender({
         active={value.includes(item.value)}
       >
         <Group gap="sm">
-          {value.includes(item.value) ? <CheckIcon size={12} /> : null}
+          {value.includes(item.value) ? <CheckIcon size={12} color="gray" /> : null}
           <span>{item.render ? item.render() : item.label}</span>
         </Group>
       </Combobox.Option>
