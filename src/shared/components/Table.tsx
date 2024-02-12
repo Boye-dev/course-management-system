@@ -104,7 +104,7 @@ const MantineTable = <T,>({
     ));
 
   return (
-    <Paper p={10} shadow="xs" mih="calc(100vh - 60px)" mb={100}>
+    <Paper p={10} shadow="xs" mih="auto" mb={100}>
       <Table.ScrollContainer minWidth="100%">
         <Table {...props}>
           <Table.Thead>
