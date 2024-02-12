@@ -18,3 +18,9 @@ export interface ApiResponse {
   page: number;
   pageSize: number;
 }
+
+export interface IFilter {
+  label: string;
+  values: any;
+  key: string;
+}

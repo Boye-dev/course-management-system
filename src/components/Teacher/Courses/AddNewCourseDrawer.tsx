@@ -1,4 +1,4 @@
-import { Box, Button, Center, Drawer, Group, Loader, Text } from '@mantine/core';
+import { Box, Button, Center, Drawer, Group, Loader, Space, Text } from '@mantine/core';
 import { useForm, zodResolver } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import {
@@ -12,16 +12,12 @@ import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import { useInView } from 'react-intersection-observer';
 import { IDrawerProps } from '@/interfaces/helperInterface';
-import {
-  ApiCoursesResponse,
-  ICourseParams,
-  enrollCourseMutation,
-  getCourses,
-} from '@/services/course.service';
+import { ApiCoursesResponse, enrollCourseMutation } from '@/services/course.service';
 import { handleErrors } from '@/utils/handleErrors';
-import { convertAllLowercaseToSentenceCase } from '@/utils/textHelpers';
-import { getDecodedJwt } from '@/api/Auth';
 import { MultiSelectRender } from '@/shared/components/MultiSelectRender';
+import { ITeacherParams, getTeachers } from '@/services/teacher.service';
+import { SelectRender } from '@/shared/components/SelectRender';
+import useCoursesInfiiniteQuery from '@/hooks/useCoursesInfiiniteQuery';
 
 const AddNewCourseDrawer = ({
   opened,
@@ -32,34 +28,51 @@ const AddNewCourseDrawer = ({
     options?: RefetchOptions | undefined
   ) => Promise<QueryObserverResult<void | ApiCoursesResponse, Error>>;
 }) => {
-  const { ref, inView } = useInView();
-  const decodedUser = getDecodedJwt();
+  const { ref: teacherRef, inView: teacherInview } = useInView();
+  const { isFetching, isFetchingNextPage, coursesData, search, setSearch } =
+    useCoursesInfiiniteQuery({
+      enabled: opened,
+    });
   const schema = z.object({
-    courses: z.any(),
+    courses: z.array(z.string()).refine((data) => data.length > 0, {
+      message: 'Select a course',
+    }),
+    teacher: z.string().min(1, { message: 'Teacher is required' }),
   });
   const form = useForm({
     initialValues: {
       courses: [],
+      teacher: '',
     },
 
     validate: zodResolver(schema),
   });
-  const [search, setSearch] = useState('');
-  const [debounced] = useDebouncedValue(search, 200);
-  const [tableParams, setTableParams] = useState<ICourseParams>({
+
+  const [searchTeacher, setSearchTeacher] = useState('');
+  const [debouncedTeacher] = useDebouncedValue(searchTeacher, 200);
+  const [tableParamsTeachers, setTableParamsTeachers] = useState<ITeacherParams>({
     page: 0,
     pageSize: '10',
-    search,
-    searchBy: ['name'],
+    search: searchTeacher,
+    searchBy: ['firstName', 'lastName', 'middleName'],
   });
 
   useEffect(() => {
-    setTableParams({ ...tableParams, search: debounced.length > 0 ? debounced : '' });
-  }, [debounced]);
-  const { fetchNextPage, hasNextPage, isFetchingNextPage, isFetching, data } = useInfiniteQuery({
-    queryKey: ['courses-infinte', tableParams],
+    setTableParamsTeachers({
+      ...tableParamsTeachers,
+      search: debouncedTeacher.length > 0 ? debouncedTeacher : '',
+    });
+  }, [debouncedTeacher]);
+  const {
+    fetchNextPage: fetchNextPageTeachers,
+    hasNextPage: hasNextPageTeachers,
+    isFetchingNextPage: isFetchingNextPageTeachers,
+    isFetching: isFetchingTeachers,
+    data: dataTeachers,
+  } = useInfiniteQuery({
+    queryKey: ['teachers-infinte', tableParamsTeachers],
     enabled: opened,
-    queryFn: ({ pageParam }) => getCourses({ ...tableParams, page: pageParam }),
+    queryFn: ({ pageParam }) => getTeachers({ ...tableParamsTeachers, page: pageParam }),
     initialPageParam: 0,
     getNextPageParam: (lastPage: any, pages: any) => {
       const totalItems = lastPage?.total;
@@ -75,7 +88,6 @@ const AddNewCourseDrawer = ({
       return undefined;
     },
   });
-
   const { mutate, isPending } = useMutation({
     mutationFn: enrollCourseMutation,
     onSuccess: () => {
@@ -95,32 +107,41 @@ const AddNewCourseDrawer = ({
   const addCourse = (values: Record<string, any>) => {
     const payload = {
       courses: values.courses,
-      id: decodedUser.id,
+      id: values.teacher,
     };
     mutate(payload);
   };
 
   useEffect(() => {
-    if (inView && hasNextPage) {
-      fetchNextPage();
+    if (teacherInview && hasNextPageTeachers) {
+      fetchNextPageTeachers();
     }
-  }, [inView, fetchNextPage, hasNextPage]);
-  const coursesData =
-    data?.pages
-      .flatMap((page) => page.data)
-      ?.map((course, i) => {
-        if (data?.pages.flatMap((page) => page.data).length === i + 1) {
+  }, [teacherInview, fetchNextPageTeachers, hasNextPageTeachers]);
+
+  const teachersData =
+    dataTeachers?.pages
+      .flatMap((page) => page?.data)
+      ?.map((teacher, i) => {
+        if (dataTeachers?.pages.flatMap((page) => page?.data).length === i + 1) {
           return {
-            render: () => <Text ref={ref}>{convertAllLowercaseToSentenceCase(course?.name)}</Text>,
-            label: `${convertAllLowercaseToSentenceCase(course?.name)}`,
-            value: course?._id,
+            render: () => (
+              <Text ref={teacherRef}>
+                {teacher?.lastName} {teacher?.middleName} {teacher?.firstName}
+              </Text>
+            ),
+            label: `${teacher?.lastName} ${teacher?.middleName} ${teacher?.firstName}`,
+            value: teacher?._id,
             disabled: false,
           };
         }
         return {
-          render: () => <Text>{convertAllLowercaseToSentenceCase(course?.name)}</Text>,
-          label: `${convertAllLowercaseToSentenceCase(course?.name)}`,
-          value: course?._id,
+          render: () => (
+            <Text ref={teacherRef}>
+              {teacher?.lastName} {teacher?.middleName} {teacher?.firstName}
+            </Text>
+          ),
+          label: `${teacher?.lastName} ${teacher?.middleName} ${teacher?.firstName}`,
+          value: teacher?._id,
           disabled: false,
         };
       }) || [];
@@ -133,8 +154,8 @@ const AddNewCourseDrawer = ({
             <MultiSelectRender
               maxDropdownHeight={250}
               label="Courses"
-              search={search}
-              setSearch={setSearch}
+              searchValue={search}
+              onSearch={(searchValue) => setSearch(searchValue)}
               placeholder="Courses"
               data={
                 isFetching && isFetchingNextPage
@@ -160,6 +181,38 @@ const AddNewCourseDrawer = ({
                     : coursesData || []
               }
               {...form.getInputProps('courses')}
+            />
+            <Space h={10} />
+            <SelectRender
+              maxDropdownHeight={300}
+              label="Teacher"
+              search={searchTeacher}
+              setSearch={setSearchTeacher}
+              placeholder="Teacher"
+              data={
+                isFetchingTeachers && isFetchingNextPageTeachers
+                  ? teachersData?.concat({
+                      label: 'Fetching More',
+                      disabled: true,
+                      value: 'Fetching More',
+                      render: () => (
+                        <Center inline>
+                          <Loader size="sm" />
+                          <Text>Fetching More</Text>
+                        </Center>
+                      ),
+                    })
+                  : isFetchingTeachers
+                    ? [
+                        {
+                          value: 'Fetching Teachers',
+                          label: 'Fetching Teachers',
+                          disabled: true,
+                        },
+                      ]
+                    : teachersData || []
+              }
+              {...form.getInputProps('teacher')}
             />
           </Box>
           <Group justify="end" pos="sticky" bottom={0} bg="white" p={10} style={{ zIndex: '100' }}>

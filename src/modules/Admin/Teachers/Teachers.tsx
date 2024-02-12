@@ -1,6 +1,17 @@
 import { useState } from 'react';
 import { useDisclosure } from '@mantine/hooks';
-import { Avatar, Box, Button, Flex, Pill, Text, Title, useMantineTheme } from '@mantine/core';
+import {
+  Avatar,
+  Box,
+  Button,
+  Center,
+  Flex,
+  Loader,
+  Pill,
+  Text,
+  Title,
+  useMantineTheme,
+} from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import MantineTable, { ColumnHead } from '@/shared/components/Table';
 import { IUser } from '@/interfaces/auth.interface';
@@ -11,15 +22,24 @@ import {
   convertAllLowercaseToSentenceCase,
   convertAllUpperCaseToSentenceCase,
 } from '@/utils/textHelpers';
+import useDepartmentsInfiniteQuery from '@/hooks/useDepartmentsInfiniteQuery';
+import Filter from '@/shared/components/Filter';
+import useFilter from '@/hooks/useFilter';
 import { ITeacherParams, getTeachers } from '@/services/teacher.service';
 
 const Teachers = () => {
   const theme = useMantineTheme();
-  const [tableParams, setTableParams] = useState<ITeacherParams>({
-    page: 0,
-    pageSize: '10',
-  });
+  const { setFilterValues, tableParams, setTableParams, search, setSearch } =
+    useFilter<ITeacherParams>({
+      defaultParams: {
+        page: 0,
+        pageSize: '10',
+        sortBy: 'lastName',
+        searchBy: ['firstName', 'lastName', 'middleName', 'email'],
+      },
+    });
   const [addNew, { open: openAddNew, close: closeAddNew }] = useDisclosure();
+
   const [row, setRow] = useState<IUser | undefined>();
   const [edit, { open: openEdit, close: closeEdit }] = useDisclosure();
   const { data, refetch, isFetching } = useQuery({
@@ -62,12 +82,83 @@ const Teachers = () => {
       ),
     },
   ];
+  const {
+    isFetchingDepartments,
+    isFetchingDepartmentsNextPage,
+    departmentsData,
+    setTableParamsDepartment,
+    tableParamsDepartment,
+  } = useDepartmentsInfiniteQuery();
 
   return (
     <>
       <Box>
-        <Flex justify="space-between" align="center">
-          <Title my={30}>Teachers</Title>
+        <Flex justify="space-between" align="center" wrap="wrap" gap={10}>
+          <Flex align="center" gap={5} wrap="wrap">
+            <Title my={30}>Teachers</Title>
+
+            <Filter
+              search={search}
+              searchPlaceholder="search by name or email"
+              applyFilters={(val) => setFilterValues(val)}
+              onSearchChange={(val: string) => setSearch(val)}
+              data={[
+                {
+                  type: 'multiselect',
+                  placeholder: 'Departments',
+                  label: 'Departments',
+                  key: 'department',
+                  searchValue: tableParamsDepartment.search,
+                  onSearch: (searchValue: string) =>
+                    setTableParamsDepartment({ ...tableParamsDepartment, search: searchValue }),
+                  data:
+                    isFetchingDepartments && isFetchingDepartmentsNextPage
+                      ? departmentsData?.concat({
+                          label: 'Fetching More',
+                          disabled: true,
+                          value: 'Fetching More',
+                          render: () => (
+                            <Center inline>
+                              <Loader size="sm" />
+                              <Text>Fetching More</Text>
+                            </Center>
+                          ),
+                        })
+                      : isFetchingDepartments
+                        ? [
+                            {
+                              value: 'Fetching Departments',
+                              label: 'Fetching Departments',
+                              disabled: true,
+                            },
+                          ]
+                        : departmentsData || [],
+                },
+                {
+                  type: 'multiselect',
+                  placeholder: 'Gender',
+                  label: 'Gender',
+                  key: 'gender',
+                  data: [
+                    { label: 'Male', value: 'Male' },
+                    { label: 'Female', value: 'Female' },
+                  ],
+                },
+
+                {
+                  type: 'multiselect',
+                  placeholder: 'Status',
+                  label: 'Status',
+                  key: 'status',
+                  data: [
+                    { label: 'Active', value: 'ACTIVE' },
+                    { label: 'Inactive', value: 'INACTIVE' },
+                  ],
+                },
+              ]}
+            />
+          </Flex>
+
           <Button onClick={openAddNew}>Add New</Button>
         </Flex>
         <MantineTable<IUser>

@@ -1,36 +1,22 @@
-import { useEffect, useState } from 'react';
-import {
-  ActionIcon,
-  Box,
-  Button,
-  Flex,
-  Group,
-  Menu,
-  Modal,
-  Stack,
-  Text,
-  Title,
-  Tooltip,
-  useMantineTheme,
-} from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
+import { useEffect } from 'react';
+import { Box, Button, Flex, Text, Title, Tooltip, useMantineTheme } from '@mantine/core';
 import { useNavigate, useParams } from 'react-router-dom';
 import { notifications } from '@mantine/notifications';
 import { useQuery } from '@tanstack/react-query';
-import { IconDotsVertical } from '@tabler/icons-react';
-import { IEnrolledCourseDetails, IMyCourse } from '@/interfaces/courses.interface';
+import { IMyCourse } from '@/interfaces/courses.interface';
 import { getPersonalInfo } from '@/services/admin.services';
 import { getDecodedJwt } from '@/api/Auth';
 import { RegistrationStatusEnum } from '@/interfaces/auth.interface';
 import { convertAllLowercaseToSentenceCase } from '@/utils/textHelpers';
 import MantineTable, { ColumnHead } from '@/shared/components/Table';
 import { ICourseParams, getEnrolledStudentCourses } from '@/services/course.service';
+import Filter from '@/shared/components/Filter';
+import useFilter from '@/hooks/useFilter';
 
 const MyCourses = () => {
   const theme = useMantineTheme();
   const navigate = useNavigate();
-  const [, setSelectedRow] = useState<IEnrolledCourseDetails | {}>();
-  const [modal, { open: openModal, close: closeModal }] = useDisclosure();
+
   const { year } = useParams();
   const decodedUser = getDecodedJwt();
   const { data, isFetching } = useQuery({
@@ -60,11 +46,22 @@ const MyCourses = () => {
       }
     }
   }, [year, isFetching]);
-  const [tableParams, setTableParams] = useState<ICourseParams>({
-    page: 0,
-    year,
-    pageSize: '10',
-  });
+  const { setFilterValues, tableParams, setTableParams, search, setSearch } =
+    useFilter<ICourseParams>({
+      defaultParams: {
+        page: 0,
+        pageSize: '10',
+        yearTaken: year || '',
+        sortBy: 'course.course.name',
+        searchBy: [
+          'course.course.name',
+          'course.course.code',
+          'course.teacher.firstName',
+          'course.teacher.lastName',
+          'course.teacher.middleName',
+        ],
+      },
+    });
 
   const { data: courses, isFetching: isFetchingCourses } = useQuery({
     queryKey: ['courses-enrolled', tableParams],
@@ -141,44 +138,48 @@ const MyCourses = () => {
         <Text c={index % 2 !== 0 ? theme.colors.dark[9] : theme.white}>{gp}</Text>
       ),
     },
-    {
-      label: '',
-      key: 'course',
-      render: (row) => (
-        <Menu shadow="md" width={100}>
-          <Menu.Target>
-            <ActionIcon
-              disabled={canNotUpdate()}
-              variant="default"
-              onClick={() => {
-                setSelectedRow(row);
-              }}
-            >
-              <Tooltip
-                bg={theme.colors.red[6]}
-                label="Please reach out to the System Admin to perform this action"
-                position="bottom"
-                hidden={!canNotUpdate()}
-              >
-                <IconDotsVertical />
-              </Tooltip>
-            </ActionIcon>
-          </Menu.Target>
-          <Menu.Dropdown onClick={openModal}>
-            <Menu.Item>Remove</Menu.Item>
-          </Menu.Dropdown>
-        </Menu>
-      ),
-    },
   ];
 
   return (
     <>
       <Box>
         <Flex justify="space-between" align="center">
-          <Title my={30}>
-            My Courses<span style={{ fontSize: '13px' }}>/{year}</span>
-          </Title>
+          <Flex align="center" gap={5} wrap="wrap">
+            <Title my={30}>
+              My Courses<span style={{ fontSize: '13px' }}>/{year}</span>
+            </Title>
+            <Filter
+              search={search}
+              searchPlaceholder="search by course name or code"
+              applyFilters={(val) => setFilterValues(val)}
+              onSearchChange={(val: string) => setSearch(val)}
+              data={[
+                {
+                  type: 'multiselect',
+                  placeholder: 'Grade',
+                  label: 'Grade',
+                  key: 'grade',
+                  data: [
+                    { label: 'F', value: 'F' },
+                    { label: 'A', value: 'A' },
+                    { label: 'B', value: 'B' },
+                    { label: 'C', value: 'C' },
+                    { label: 'D', value: 'D' },
+                    { label: 'E', value: 'E' },
+                    { label: 'NG', value: 'NG' },
+                    { label: 'F1', value: 'F1' },
+                  ],
+                },
+
+                {
+                  type: 'number',
+                  placeholder: 'Units',
+                  label: 'Units',
+                  key: 'units',
+                },
+              ]}
+            />
+          </Flex>
           <Tooltip
             bg={theme.colors.red[6]}
             label="Please reach out to the System Admin to perform this action"
@@ -189,7 +190,7 @@ const MyCourses = () => {
               onClick={() => navigate('/student/courses/1/add-courses')}
               disabled={canNotUpdate()}
             >
-              Add New
+              Edit Course Selection
             </Button>
           </Tooltip>
         </Flex>
@@ -203,27 +204,6 @@ const MyCourses = () => {
           onPageChange={(val) => setTableParams({ ...tableParams, page: val })}
           loading={isFetchingCourses || isFetching}
         />
-
-        <Modal opened={modal} onClose={closeModal} withCloseButton={false} centered>
-          <Stack h={200} justify="space-evenly">
-            <Stack align="center">
-              <Text>Are You Sure ?</Text>
-              <Text>Are you sure you want to remove this course?</Text>
-            </Stack>
-            <Group justify="flex-end" my={10}>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setSelectedRow({});
-                  closeModal();
-                }}
-              >
-                Cancel
-              </Button>
-              <Button color="red">Remove Course</Button>
-            </Group>
-          </Stack>
-        </Modal>
       </Box>
     </>
   );

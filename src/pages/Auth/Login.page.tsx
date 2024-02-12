@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import {
   Button,
@@ -18,7 +18,7 @@ import { useMutation } from '@tanstack/react-query';
 import { z } from 'zod';
 import logo from '@/assets/images/babcock-logo.png';
 import { IOtpInterface, LoginInterface } from '@/interfaces/auth.interface';
-import { login, verifyOtp } from '@/services/auth.service';
+import { login, resendOtp, verifyOtp } from '@/services/auth.service';
 import Auth from '@/api/Auth';
 import { Roles } from '@/constants/roles';
 import { handleErrors } from '@/utils/handleErrors';
@@ -31,6 +31,7 @@ const Login = () => {
   const navigate = useNavigate();
   const theme = useMantineTheme();
   const [showOtp, setShowOtp] = useState<boolean>(false);
+  const [interval, setCountdown] = useState<boolean>(false);
   const schema = z.object({
     username: z.string().email({ message: 'Invalid Email Address' }),
     password: z.string().min(6, 'Password must be greater than 6'),
@@ -59,6 +60,21 @@ const Login = () => {
         color: 'green',
       });
       setShowOtp(true);
+      setCountdown(!interval);
+    },
+    onError: (error) => {
+      handleErrors(error);
+    },
+  });
+  const { mutate: resendOtpMutation, isPending: isPendingResend } = useMutation({
+    mutationFn: resendOtp,
+    onSuccess: () => {
+      notifications.show({
+        title: 'Otp Resent successful',
+        message: 'Please enter your otp',
+        color: 'green',
+      });
+      setCountdown(!interval);
     },
     onError: (error) => {
       handleErrors(error);
@@ -112,6 +128,41 @@ const Login = () => {
     return '';
   };
 
+  const [timeSpan, setTimeSpan] = useState<number>(0);
+  useEffect(() => {
+    let timerInterval: any;
+    if (showOtp) {
+      const startTime = Date.now();
+      const endTime = new Date(startTime);
+      endTime.setMinutes(endTime.getMinutes() + 1);
+
+      const calculateTimeSpan = () => {
+        const remainingTime = endTime.getTime() - Date.now();
+        setTimeSpan(() => Math.max(0, remainingTime));
+      };
+
+      calculateTimeSpan();
+
+      timerInterval = setInterval(() => {
+        calculateTimeSpan();
+      }, 1000);
+    }
+
+    return () => {
+      clearInterval(timerInterval);
+    };
+  }, [interval]);
+  const formatTime = (milliseconds: number): string => {
+    const totalSeconds = Math.floor(milliseconds / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+
+    const formattedMinutes = String(minutes).padStart(2, '0');
+    const formattedSeconds = String(seconds).padStart(2, '0');
+
+    return `in ${formattedMinutes}:${formattedSeconds}`;
+  };
+
   return loading ? (
     <BabcockLoader />
   ) : authenticated ? (
@@ -146,6 +197,23 @@ const Login = () => {
                   <Button fullWidth mt={15} type="submit" loading={isVerifyingOtp}>
                     Verify
                   </Button>
+                  <Flex justify="center" mt={10} align="center">
+                    <Text fz={12}>Otp not received? </Text>
+                    <Button
+                      fz={12}
+                      h={20}
+                      disabled={timeSpan !== 0}
+                      loading={isPendingResend}
+                      ml={10}
+                      onClick={() => {
+                        if (timeSpan === 0) {
+                          resendOtpMutation(data?.data);
+                        }
+                      }}
+                    >
+                      Resend Otp {timeSpan !== 0 && formatTime(timeSpan)}
+                    </Button>
+                  </Flex>
                 </form>
               </Stack>
             </>
@@ -174,6 +242,7 @@ const Login = () => {
                 fz={12}
                 ta="right"
                 mt={5}
+                onClick={() => navigate('/forgot-password')}
                 style={{ cursor: 'pointer' }}
               >
                 Forgot Password?

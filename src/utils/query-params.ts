@@ -12,8 +12,9 @@ export const queryParamsHelper = (queryParams?: IQueryParams): string => {
         validParams.push(`page=${Number(value) + 1}`);
       } else if (Array.isArray(value)) {
         const arrayToString = value.toString().replaceAll(',', `&${key}=`);
-
-        validParams.push(`${key}=${arrayToString}`);
+        if (arrayToString.length > 0) {
+          validParams.push(`${key}=${arrayToString}`);
+        }
       } else {
         validParams.push(`${key}=${value}`);
       }

@@ -17,11 +17,18 @@ import AdminProtectedRoutes from './shared/components/Auth/AdminProtectedRoutes'
 import StudentProtectedRoutes from './shared/components/Auth/StudentProtectedRoutes';
 import TeacherProtectedRoutes from './shared/components/Auth/TeacherProtectedRoutes';
 import Years from './modules/Teacher/Courses/Years';
+import EnrolledTeachers from './modules/Admin/EnrolledCourses/EnrolledTeachers';
+import Verify from './pages/Auth/Verify.page';
+import ForgotPassword from './pages/Auth/ForgotPassword';
+import ResetPassword from './pages/Auth/ResetPassword';
 
 const loadingOverlay = () => LoadingOverlay;
 const router = createBrowserRouter([
   { path: '/', element: <Navigate to="/login" /> },
   { path: '/login', Component: Login },
+  { path: '/verify-user', Component: Verify },
+  { path: '/forgot-password', Component: ForgotPassword },
+  { path: '/resetPassword', Component: ResetPassword },
   {
     path: '/admin',
     element: <AdminProtectedRoutes />,
@@ -49,6 +56,10 @@ const router = createBrowserRouter([
       {
         path: 'departments',
         Component: Departments,
+      },
+      {
+        path: 'enrolled-teachers',
+        Component: EnrolledTeachers,
       },
       {
         path: 'schools',

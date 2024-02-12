@@ -38,6 +38,11 @@ export const getSettings = async () => {
   }
   return undefined;
 };
+
+export const updateSettings = (payload: {
+  registrationAllowed: Record<string, Record<string, string>>;
+}) => Api.patch<ISettings>('/api/settings/65a2d4069a03ce9ea7069c1d', payload);
+
 export const updatePersonalInfo = (payload: IPatchUserPayload) =>
   Api.patch<IUser>(`/api/user/${payload.id}`, payload.formData);
 

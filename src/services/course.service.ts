@@ -7,7 +7,7 @@ import { queryParamsHelper } from '@/utils/query-params';
 export interface ICourseParams extends ITableParams {
   searchBy?: string[];
   department?: string[];
-  yearTaken?: string[];
+  yearTaken?: string[] | string;
   year?: string;
 }
 

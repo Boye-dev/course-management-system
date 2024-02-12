@@ -1,32 +1,35 @@
-import { Box, Button, Flex, Paper, Space, Text, Title, useMantineTheme } from '@mantine/core';
+import { Box, Flex, Paper, Space, Text, Title, useMantineTheme } from '@mantine/core';
 import { IconBook } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useDisclosure } from '@mantine/hooks';
 import { ICourseParams, getEnrolledCourses } from '@/services/course.service';
-import AddNewCourseDrawer from '@/components/Teacher/Courses/AddNewCourseDrawer';
 import { getDecodedJwt } from '@/api/Auth';
 import BabcockLoader from '@/shared/components/BabcockLoader';
 import { convertAllLowercaseToSentenceCase } from '@/utils/textHelpers';
 import MantinePagination from '@/shared/components/Pagination';
+import Filter from '@/shared/components/Filter';
+import useFilter from '@/hooks/useFilter';
 
 const Courses = () => {
   const theme = useMantineTheme();
-  const [addNew, { open: openAddNew, close: closeAddNew }] = useDisclosure();
 
   const navigate = useNavigate();
-  const [tableParams, setTableParams] = useState<ICourseParams>({
-    page: 0,
-    pageSize: '10',
-  });
+
   const decodedUser = getDecodedJwt();
 
+  const { setFilterValues, tableParams, setTableParams, search, setSearch } =
+    useFilter<ICourseParams>({
+      defaultParams: {
+        page: 0,
+        pageSize: '10',
+        sortBy: 'course.name',
+        searchBy: ['course.name', 'course.code'],
+      },
+    });
   const { data, isFetching } = useQuery({
     queryKey: ['courses-enrolled', tableParams],
     queryFn: () => getEnrolledCourses({ teacher: decodedUser.id, queryParams: tableParams }),
   });
-
   return (
     <>
       <Box>
@@ -35,8 +38,16 @@ const Courses = () => {
           align={{ xs: 'flex-start', md: 'center' }}
           direction={{ xs: 'column', md: 'row' }}
         >
-          <Title my={30}>My Courses</Title>
-          <Button onClick={openAddNew}>Enroll In A Course</Button>
+          <Flex>
+            <Title my={30}>My Courses</Title>
+            <Filter
+              search={search}
+              searchPlaceholder="search by name or code"
+              applyFilters={(val) => setFilterValues(val)}
+              onSearchChange={(val: string) => setSearch(val)}
+              showFilter={false}
+            />
+          </Flex>
         </Flex>
         <Space h={15} />
         {isFetching ? (
@@ -61,10 +72,11 @@ const Courses = () => {
                     </Text>
                   </Flex>
                   <Text c={theme.colors.brandSecondary?.[9]} fz={12} fw={400}>
-                    Computer Tech
+                    {convertAllLowercaseToSentenceCase(course?.course?.department.name)}
                   </Text>
                   <Text c={theme.colors.brandSecondary?.[9]} fz={12} fw={400}>
-                    3 Units
+                    {`${course?.course?.units}unit`}
+                    {course?.course?.units > 1 ? 's' : ''}
                   </Text>
                 </Paper>
               ))}
@@ -84,7 +96,6 @@ const Courses = () => {
             pageSize={parseInt(tableParams.pageSize, 10)}
           />
         </Box>
-        <AddNewCourseDrawer opened={addNew} close={closeAddNew} />
       </Box>
     </>
   );

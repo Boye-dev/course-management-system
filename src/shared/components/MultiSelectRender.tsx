@@ -17,28 +17,36 @@ export function MultiSelectRender({
   placeholder,
   label,
   maxDropdownHeight,
-  search,
-  setSearch,
+  defaultValues,
+  onSearch,
+  searchValue,
   ...formProps
 }: GetInputPropsReturnType & {
   data: OptionProps[];
   placeholder: string;
   label: string;
   maxDropdownHeight?: number;
-  search: string;
-  setSearch: React.Dispatch<React.SetStateAction<string>>;
+  defaultValues?: string[];
+  onSearch?: (_searchValue: string) => void;
+  searchValue?: string;
 }) {
   const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),
     onDropdownOpen: () => combobox.updateSelectedOptionIndex('active'),
   });
+  const [search, setSearch] = useState('');
+  const [value, setValue] = useState<string[]>(defaultValues || []);
+  const [valuesSlected, setValuesSelected] = useState<OptionProps[]>(data || []);
 
-  const [value, setValue] = useState<string[]>([]);
-
-  const handleValueSelect = (val: string) =>
+  const handleValueSelect = (val: string) => {
+    const selectedData = data.find((item) => val === item.value);
+    if (selectedData) {
+      setValuesSelected((prev) => [...prev, selectedData]);
+    }
     setValue((current) =>
       current.includes(val) ? current.filter((v) => v !== val) : [...current, val]
     );
+  };
   useEffect(() => {
     formProps.onChange(value);
   }, [value]);
@@ -47,7 +55,7 @@ export function MultiSelectRender({
 
   const values = value.map((item) => (
     <Pill key={item} withRemoveButton onRemove={() => handleValueRemove(item)}>
-      {data.find((val) => val.value === item)?.label}
+      {valuesSlected.find((val) => val.value === item)?.label}
     </Pill>
   ));
 
@@ -72,6 +80,7 @@ export function MultiSelectRender({
       <Text fw={500}>{label}</Text>
       <Combobox.DropdownTarget>
         <PillsInput
+          error={formProps.error}
           pointer
           onClick={() => combobox.openDropdown()}
           size="md"
@@ -85,15 +94,31 @@ export function MultiSelectRender({
               <PillsInput.Field
                 onFocus={() => combobox.openDropdown()}
                 onBlur={() => combobox.closeDropdown()}
-                value={search}
+                value={searchValue || search}
                 placeholder={placeholder}
                 onChange={(event) => {
                   combobox.updateSelectedOptionIndex();
-                  setSearch(event.currentTarget.value);
+                  if (onSearch) {
+                    onSearch(event.currentTarget.value);
+                  } else {
+                    setSearch(event.currentTarget.value);
+                  }
                 }}
                 onKeyDown={(event) => {
-                  if (event.key === 'Backspace' && search.length === 0) {
+                  if (onSearch) {
+                    if (event.key === 'Backspace') {
+                      event.preventDefault();
+
+                      onSearch(
+                        event.currentTarget.value.substring(0, event.currentTarget.value.length - 1)
+                      );
+                    }
+                    if (event.key === 'Backspace' && searchValue?.length === 0) {
+                      handleValueRemove(value[value.length - 1]);
+                    }
+                  } else if (event.key === 'Backspace' && search.length === 0) {
                     event.preventDefault();
+
                     handleValueRemove(value[value.length - 1]);
                   }
                 }}

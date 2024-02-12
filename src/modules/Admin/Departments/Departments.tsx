@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useDisclosure } from '@mantine/hooks';
-import { Box, Button, Flex, Text, Title, useMantineTheme } from '@mantine/core';
+import { Box, Button, Center, Flex, Loader, Text, Title, useMantineTheme } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import MantineTable, { ColumnHead } from '@/shared/components/Table';
 import AddNewDepartmentDrawer from '@/components/Admin/Departments/AddNewDepartmentDrawer';
@@ -8,13 +8,22 @@ import EditDepartmentDrawer from '@/components/Admin/Departments/EditDepartmentD
 import { IDepartmentDetails } from '@/interfaces/courses.interface';
 import { IDepartmentParams, getDepartments } from '@/services/department.service';
 import { convertAllLowercaseToSentenceCase } from '@/utils/textHelpers';
+import Filter from '@/shared/components/Filter';
+import useSchoolInfiniteQuery from '@/hooks/useSchoolInfiniteQuery';
+import useFilter from '@/hooks/useFilter';
 
 const Departments = () => {
   const theme = useMantineTheme();
-  const [tableParams, setTableParams] = useState<IDepartmentParams>({
-    page: 0,
-    pageSize: '10',
-  });
+
+  const { setFilterValues, tableParams, setTableParams, search, setSearch } =
+    useFilter<IDepartmentParams>({
+      defaultParams: {
+        page: 0,
+        pageSize: '10',
+        sortBy: 'name',
+        searchBy: ['name', 'code'],
+      },
+    });
   const [addNew, { open: openAddNew, close: closeAddNew }] = useDisclosure();
   const [row, setRow] = useState<IDepartmentDetails | undefined>();
   const [edit, { open: openEdit, close: closeEdit }] = useDisclosure();
@@ -52,11 +61,67 @@ const Departments = () => {
       ),
     },
   ];
+  const {
+    isFetchingSchools,
+    isFetchingSchoolsNextPage,
+    schoolsData,
+    setTableParamsSchool,
+    tableParamsSchool,
+  } = useSchoolInfiniteQuery();
   return (
     <>
       <Box>
-        <Flex justify="space-between" align="center">
-          <Title my={30}>Departments</Title>
+        <Flex justify="space-between" align="center" wrap="wrap" gap={10}>
+          <Flex align="center" gap={5} wrap="wrap">
+            <Title my={30}>Departments</Title>
+
+            <Filter
+              search={search}
+              searchPlaceholder="search by name or code"
+              applyFilters={(val) => setFilterValues(val)}
+              onSearchChange={(val: string) => setSearch(val)}
+              data={[
+                {
+                  type: 'multiselect',
+                  placeholder: 'Schools',
+                  label: 'Schools',
+                  key: 'school',
+                  searchValue: tableParamsSchool.search,
+                  onSearch: (searchValue: string) =>
+                    setTableParamsSchool({ ...tableParamsSchool, search: searchValue }),
+                  data:
+                    isFetchingSchools && isFetchingSchoolsNextPage
+                      ? schoolsData?.concat({
+                          label: 'Fetching More',
+                          disabled: true,
+                          value: 'Fetching More',
+                          render: () => (
+                            <Center inline>
+                              <Loader size="sm" />
+                              <Text>Fetching More</Text>
+                            </Center>
+                          ),
+                        })
+                      : isFetchingSchools
+                        ? [
+                            {
+                              value: 'Fetching Departments',
+                              label: 'Fetching Departments',
+                              disabled: true,
+                            },
+                          ]
+                        : schoolsData || [],
+                },
+                {
+                  type: 'number',
+                  placeholder: 'Year Taken',
+                  label: 'Year Taken',
+                  key: 'yearsTaken',
+                },
+              ]}
+            />
+          </Flex>
+
           <Button onClick={openAddNew}>Add New</Button>
         </Flex>
         <MantineTable<IDepartmentDetails>

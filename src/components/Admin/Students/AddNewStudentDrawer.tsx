@@ -14,13 +14,7 @@ import {
 } from '@mantine/core';
 import { z } from 'zod';
 import { useForm, zodResolver } from '@mantine/form';
-import {
-  QueryObserverResult,
-  RefetchOptions,
-  useInfiniteQuery,
-  useMutation,
-} from '@tanstack/react-query';
-import { useInView } from 'react-intersection-observer';
+import { QueryObserverResult, RefetchOptions, useMutation } from '@tanstack/react-query';
 import { useDebouncedValue } from '@mantine/hooks';
 import { DateInput, YearPickerInput } from '@mantine/dates';
 import dayjs from 'dayjs';
@@ -31,13 +25,9 @@ import { ApiStudentsResponse, addStudent } from '@/services/student.service';
 import useStateAndLGA from '@/hooks/useStateAndLga';
 import { handleErrors } from '@/utils/handleErrors';
 import { GenderEnum, RelationshipStatusEnum } from '@/interfaces/auth.interface';
-import {
-  ApiDepartmentsResponse,
-  IDepartmentParams,
-  getDepartments,
-} from '@/services/department.service';
-import { convertAllLowercaseToSentenceCase } from '@/utils/textHelpers';
+import { IDepartmentParams } from '@/services/department.service';
 import { SelectRender } from '@/shared/components/SelectRender';
+import useDepartmentsInfiniteQuery from '@/hooks/useDepartmentsInfiniteQuery';
 
 const AddNewStudentDrawer = ({
   opened,
@@ -101,7 +91,6 @@ const AddNewStudentDrawer = ({
 
     validate: zodResolver(schema),
   });
-  const { ref, inView } = useInView();
 
   const [search, setSearch] = useState('');
   const [debounced] = useDebouncedValue(search, 200);
@@ -115,51 +104,12 @@ const AddNewStudentDrawer = ({
   useEffect(() => {
     setTableParams({ ...tableParams, search: debounced.length > 0 ? debounced : '' });
   }, [debounced]);
-  const { fetchNextPage, hasNextPage, isFetchingNextPage, isFetching, data } = useInfiniteQuery({
-    queryKey: ['departments-infinite', tableParams],
+  const {
+    isFetchingDepartments: isFetching,
+    isFetchingDepartmentsNextPage: isFetchingNextPage,
+    departmentsData,
+  } = useDepartmentsInfiniteQuery();
 
-    enabled: opened,
-    queryFn: ({ pageParam }) => getDepartments({ ...tableParams, page: pageParam }),
-    initialPageParam: 0,
-    getNextPageParam: (lastPage: any, pages: any) => {
-      const totalItems = lastPage?.total;
-      const itemsLoaded = pages.reduce(
-        (total: number, page: ApiDepartmentsResponse) => total + page.data.length,
-        0
-      );
-
-      if (itemsLoaded < totalItems) {
-        return pages.length;
-      }
-
-      return undefined;
-    },
-  });
-
-  useEffect(() => {
-    if (inView && hasNextPage) {
-      fetchNextPage();
-    }
-  }, [inView, fetchNextPage, hasNextPage]);
-  const departmentsData =
-    data?.pages
-      .flatMap((page) => page.data)
-      ?.map((course, i) => {
-        if (data?.pages.flatMap((page) => page.data).length === i + 1) {
-          return {
-            render: () => <Text ref={ref}>{convertAllLowercaseToSentenceCase(course?.name)}</Text>,
-            label: `${convertAllLowercaseToSentenceCase(course?.name)}`,
-            value: course?._id,
-            disabled: false,
-          };
-        }
-        return {
-          render: () => <Text>{convertAllLowercaseToSentenceCase(course?.name)}</Text>,
-          label: `${convertAllLowercaseToSentenceCase(course?.name)}`,
-          value: course?._id,
-          disabled: false,
-        };
-      }) || [];
   const { states } = useStateAndLGA(form.getTransformedValues().state || '');
   const { LGAs } = useStateAndLGA(form.getTransformedValues().state || '');
   const { mutate, isPending } = useMutation({

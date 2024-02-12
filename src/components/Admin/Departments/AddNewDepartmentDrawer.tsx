@@ -124,9 +124,9 @@ const AddNewDepartmentDrawer = ({
   }, [inView, fetchNextPage, hasNextPage]);
   const schoolData =
     data?.pages
-      .flatMap((page) => page.data)
+      .flatMap((page) => page?.data)
       ?.map((school, i) => {
-        if (data?.pages.flatMap((page) => page.data).length === i + 1) {
+        if (data?.pages.flatMap((page) => page?.data).length === i + 1) {
           return {
             render: () => <Text ref={ref}>{convertAllLowercaseToSentenceCase(school?.name)}</Text>,
             label: `${convertAllLowercaseToSentenceCase(school?.name)}`,

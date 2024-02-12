@@ -8,13 +8,20 @@ import EditSchoolDrawer from '@/components/Admin/Schools/EditSchoolDrawer';
 import { ISchoolDetails } from '@/interfaces/courses.interface';
 import { ISchoolParams, getSchools } from '@/services/school.service';
 import { convertAllLowercaseToSentenceCase } from '@/utils/textHelpers';
+import Filter from '@/shared/components/Filter';
+import useFilter from '@/hooks/useFilter';
 
 const Schools = () => {
   const theme = useMantineTheme();
-  const [tableParams, setTableParams] = useState<ISchoolParams>({
-    page: 0,
-    pageSize: '10',
-  });
+  const { setFilterValues, tableParams, setTableParams, search, setSearch } =
+    useFilter<ISchoolParams>({
+      defaultParams: {
+        page: 0,
+        pageSize: '10',
+        sortBy: 'name',
+        searchBy: ['name', 'code'],
+      },
+    });
 
   const [addNew, { open: openAddNew, close: closeAddNew }] = useDisclosure();
   const [row, setRow] = useState<ISchoolDetails | undefined>();
@@ -38,8 +45,19 @@ const Schools = () => {
   return (
     <>
       <Box>
-        <Flex justify="space-between" align="center">
-          <Title my={30}>Schools</Title>
+        <Flex justify="space-between" align="center" wrap="wrap" gap={10}>
+          <Flex align="center" gap={5} wrap="wrap">
+            <Title my={30}>Schools</Title>
+            <Flex>
+              <Filter
+                search={search}
+                searchPlaceholder="search by name or code"
+                applyFilters={(val) => setFilterValues(val)}
+                onSearchChange={(val: string) => setSearch(val)}
+                showFilter={false}
+              />
+            </Flex>
+          </Flex>
           <Button onClick={openAddNew}>Add New</Button>
         </Flex>
         <MantineTable<ISchoolDetails>

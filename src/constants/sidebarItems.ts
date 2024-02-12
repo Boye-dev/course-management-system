@@ -17,6 +17,12 @@ export const adminSidebarItems: SidebarItemInterface[] = [
     roles: [Roles.ADMIN],
   },
   { text: 'Courses', icon: IconBook, path: '/admin/courses', roles: [Roles.ADMIN] },
+  {
+    text: 'Enrolled Teachers',
+    icon: IconBook,
+    path: '/admin/enrolled-teachers',
+    roles: [Roles.ADMIN],
+  },
   { text: 'Teachers', icon: IconUsers, path: '/admin/teachers', roles: [Roles.ADMIN] },
   { text: 'Students', icon: IconUsersGroup, path: '/admin/students', roles: [Roles.ADMIN] },
   { text: 'Departments', icon: IconBackpack, path: '/admin/departments', roles: [Roles.ADMIN] },

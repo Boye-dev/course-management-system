@@ -1,13 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   ActionIcon,
-  // ActionIcon,
   Box,
   Button,
   Flex,
   Group,
   Menu,
-  // Menu,
   Modal,
   NumberInput,
   Space,
@@ -31,6 +29,8 @@ import { getDecodedJwt } from '@/api/Auth';
 import MantineTable, { ColumnHead } from '@/shared/components/Table';
 import { handleErrors } from '@/utils/handleErrors';
 import { convertAllLowercaseToSentenceCase } from '@/utils/textHelpers';
+import Filter from '@/shared/components/Filter';
+import useFilter from '@/hooks/useFilter';
 
 const MyStudents = () => {
   const theme = useMantineTheme();
@@ -38,10 +38,22 @@ const MyStudents = () => {
   const [selectedRow, setSelectedRow] = useState<IMyCourse>();
   const [score, setScore] = useState<number>(0);
   const [modal, { open: openModal, close: closeModal }] = useDisclosure();
-  const [tableParams, setTableParams] = useState<ICourseParams>({
-    page: 0,
-    pageSize: '10',
-  });
+  const { setFilterValues, tableParams, setTableParams, search, setSearch } =
+    useFilter<ICourseParams>({
+      defaultParams: {
+        page: 0,
+        pageSize: '10',
+        sortBy: 'grade',
+        searchBy: [
+          'course.course.name',
+          'course.course.code',
+          'student.firstName',
+          'student.lastName',
+          'student.middleName',
+          'student.email',
+        ],
+      },
+    });
   const decodedUser = getDecodedJwt();
   const {
     data: courses,
@@ -51,6 +63,16 @@ const MyStudents = () => {
     queryKey: ['courses-enrolled-students', tableParams],
     queryFn: () => getEnrolledMyStudent(tableParams, id || '', year || '', decodedUser.id),
   });
+  const [courseName, setCourseName] = useState<string | undefined>('');
+
+  useEffect(() => {
+    if (!isFetchingCourses && !courseName && courses?.data && courses.data.length > 0) {
+      const name = courses.data[0]?.course?.course?.name;
+      if (name) {
+        setCourseName(name);
+      }
+    }
+  }, [courses, courseName, isFetchingCourses]);
 
   const { mutate, isPending } = useMutation({
     mutationFn: updateScoreMutation,
@@ -83,13 +105,19 @@ const MyStudents = () => {
         </Text>
       ),
     },
-
+    {
+      label: 'Student Email',
+      key: 'student',
+      render: (val, index, student) => (
+        <Text c={index % 2 !== 0 ? theme.colors.dark[9] : theme.white}>{student.email}</Text>
+      ),
+    },
     {
       label: 'Units',
       key: 'course',
       render: (_val, index, item) => (
         <Text c={index % 2 !== 0 ? theme.colors.dark[9] : theme.white}>
-          {`${item?.course.units} unit${item?.course.units > 1 ? 's' : ''}`}
+          {`${item?.course?.units} unit${item?.course?.units > 1 ? 's' : ''}`}
         </Text>
       ),
     },
@@ -138,14 +166,51 @@ const MyStudents = () => {
       ),
     },
   ];
+
   return (
     <>
       <Box>
         <Flex justify="space-between" align="center" wrap="wrap">
-          <Title my={30}>
-            {convertAllLowercaseToSentenceCase(courses?.data[0].course.course.name || '')}
-          </Title>
-          <Flex
+          <Flex gap={20} wrap="wrap">
+            <Title my={30}>
+              {courseName
+                ? convertAllLowercaseToSentenceCase(courseName || '')
+                : 'No enrolled student'}
+              <span style={{ fontSize: '13px' }}>/{year}</span>
+            </Title>
+            <Filter
+              search={search}
+              searchPlaceholder="search by course name or code, student"
+              applyFilters={(val) => setFilterValues(val)}
+              onSearchChange={(val: string) => setSearch(val)}
+              data={[
+                {
+                  type: 'multiselect',
+                  placeholder: 'Grade',
+                  label: 'Grade',
+                  key: 'grade',
+                  data: [
+                    { label: 'F', value: 'F' },
+                    { label: 'A', value: 'A' },
+                    { label: 'B', value: 'B' },
+                    { label: 'C', value: 'C' },
+                    { label: 'D', value: 'D' },
+                    { label: 'E', value: 'E' },
+                    { label: 'NG', value: 'NG' },
+                    { label: 'F1', value: 'F1' },
+                  ],
+                },
+
+                {
+                  type: 'number',
+                  placeholder: 'Units',
+                  label: 'Units',
+                  key: 'units',
+                },
+              ]}
+            />
+          </Flex>
+          {/* <Flex
             wrap="wrap"
             justify={{ xs: 'flex-start', md: 'flex-end' }}
             w={{ xs: '100%', md: '60%' }}
@@ -154,7 +219,7 @@ const MyStudents = () => {
             <Button color={theme.colors.brandSecondary[9]} ml={10}>
               Download Template
             </Button>
-          </Flex>
+          </Flex> */}
         </Flex>
         <Space h={20} />
         <MantineTable<IMyCourse>
@@ -181,7 +246,7 @@ const MyStudents = () => {
               onChange={(val) => setScore(Number(val))}
             />
             <Group justify="flex-end" my={10}>
-              <Button variant="outline" color="red">
+              <Button variant="outline" color="red" onClick={closeModal}>
                 Cancel
               </Button>
               <Button onClick={updateScore} loading={isPending}>

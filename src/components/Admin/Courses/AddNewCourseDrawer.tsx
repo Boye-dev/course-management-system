@@ -11,26 +11,16 @@ import {
 } from '@mantine/core';
 import { useForm, zodResolver } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
-import {
-  QueryObserverResult,
-  RefetchOptions,
-  useInfiniteQuery,
-  useMutation,
-} from '@tanstack/react-query';
+import { QueryObserverResult, RefetchOptions, useMutation } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { useDebouncedValue } from '@mantine/hooks';
-import { useInView } from 'react-intersection-observer';
 import { z } from 'zod';
 import { IDrawerProps } from '@/interfaces/helperInterface';
 import { ApiCoursesResponse, addCourseMutation } from '@/services/course.service';
-import {
-  ApiDepartmentsResponse,
-  IDepartmentParams,
-  getDepartments,
-} from '@/services/department.service';
+import { IDepartmentParams } from '@/services/department.service';
 import { handleErrors } from '@/utils/handleErrors';
-import { convertAllLowercaseToSentenceCase } from '@/utils/textHelpers';
 import { SelectRender } from '@/shared/components/SelectRender';
+import useDepartmentsInfiniteQuery from '@/hooks/useDepartmentsInfiniteQuery';
 
 const AddNewCourseDrawer = ({
   opened,
@@ -41,8 +31,6 @@ const AddNewCourseDrawer = ({
     options?: RefetchOptions | undefined
   ) => Promise<QueryObserverResult<void | ApiCoursesResponse, Error>>;
 }) => {
-  const { ref, inView } = useInView();
-
   const schema = z.object({
     name: z.string().min(1, 'Course Name is required'),
     code: z
@@ -80,26 +68,11 @@ const AddNewCourseDrawer = ({
   useEffect(() => {
     setTableParams({ ...tableParams, search: debounced.length > 0 ? debounced : '' });
   }, [debounced]);
-  const { fetchNextPage, hasNextPage, isFetchingNextPage, isFetching, data } = useInfiniteQuery({
-    queryKey: ['departments-infinite', tableParams],
-
-    enabled: opened,
-    queryFn: ({ pageParam }) => getDepartments({ ...tableParams, page: pageParam }),
-    initialPageParam: 0,
-    getNextPageParam: (lastPage: any, pages: any) => {
-      const totalItems = lastPage?.total;
-      const itemsLoaded = pages.reduce(
-        (total: number, page: ApiDepartmentsResponse) => total + page.data.length,
-        0
-      );
-
-      if (itemsLoaded < totalItems) {
-        return pages.length;
-      }
-
-      return undefined;
-    },
-  });
+  const {
+    isFetchingDepartments: isFetching,
+    isFetchingDepartmentsNextPage: isFetchingNextPage,
+    departmentsData,
+  } = useDepartmentsInfiniteQuery();
 
   const { mutate, isPending } = useMutation({
     mutationFn: addCourseMutation,
@@ -127,30 +100,7 @@ const AddNewCourseDrawer = ({
     };
     mutate(payload);
   };
-  useEffect(() => {
-    if (inView && hasNextPage) {
-      fetchNextPage();
-    }
-  }, [inView, fetchNextPage, hasNextPage]);
-  const departmentsData =
-    data?.pages
-      .flatMap((page) => page.data)
-      ?.map((course, i) => {
-        if (data?.pages.flatMap((page) => page.data).length === i + 1) {
-          return {
-            render: () => <Text ref={ref}>{convertAllLowercaseToSentenceCase(course?.name)}</Text>,
-            label: `${convertAllLowercaseToSentenceCase(course?.name)}`,
-            value: course?._id,
-            disabled: false,
-          };
-        }
-        return {
-          render: () => <Text>{convertAllLowercaseToSentenceCase(course?.name)}</Text>,
-          label: `${convertAllLowercaseToSentenceCase(course?.name)}`,
-          value: course?._id,
-          disabled: false,
-        };
-      }) || [];
+
   return (
     <>
       <Drawer opened={opened} onClose={close} title="Add New Course" position="right">
