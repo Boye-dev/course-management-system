@@ -143,7 +143,7 @@ const MyCourses = () => {
   return (
     <>
       <Box>
-        <Flex justify="space-between" align="center">
+        <Flex justify="space-between" align="center" wrap="wrap" gap={10}>
           <Flex align="center" gap={5} wrap="wrap">
             <Title my={30}>
               My Courses<span style={{ fontSize: '13px' }}>/{year}</span>

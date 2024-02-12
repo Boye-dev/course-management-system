@@ -170,7 +170,7 @@ const MyStudents = () => {
   return (
     <>
       <Box>
-        <Flex justify="space-between" align="center" wrap="wrap">
+        <Flex justify="space-between" align="center" wrap="wrap" gap={10}>
           <Flex gap={20} wrap="wrap">
             <Title my={30}>
               {courseName

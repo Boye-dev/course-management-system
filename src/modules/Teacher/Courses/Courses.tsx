@@ -37,6 +37,8 @@ const Courses = () => {
           justify="space-between"
           align={{ xs: 'flex-start', md: 'center' }}
           direction={{ xs: 'column', md: 'row' }}
+          wrap="wrap"
+          gap={10}
         >
           <Flex>
             <Title my={30}>My Courses</Title>
