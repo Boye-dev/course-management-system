@@ -35,4 +35,6 @@ This template comes with the following features:
 
 
 ## Usage
-- Login as `admnin@mailinator.com`
+- Login as `testcms@mailinator.com`
+- Get otp from `https://www.mailinator.com/v4/public/inboxes.jsp?msgid=testcms-1712580565-3599431013&to=testcms#`
+- You can now ceate a student or teacher
